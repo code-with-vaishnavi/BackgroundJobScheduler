@@ -181,7 +181,7 @@ http://localhost:8080/BackgroundJobScheduler-1.0-SNAPSHOT/
 
 **Vaishnavi**
 
-B.Tech – Artificial Intelligence & Machine Learning
+MCA - Master of Computer Applications 
 
 ---
 
