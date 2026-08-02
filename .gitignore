@@ -1,17 +1,16 @@
 # Maven
 target/
 
-# IntelliJ IDEA
+# IntelliJ
 .idea/
 *.iml
-out/
-
-# Java
-*.class
 
 # Logs
 *.log
 
-# OS Files
+# OS files
 .DS_Store
 Thumbs.db
+
+# Temporary files
+out/

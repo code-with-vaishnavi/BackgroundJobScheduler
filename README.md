@@ -1,190 +1,254 @@
-# Background Job Scheduler
+# 🚀 Background Job Scheduler System
 
-A Java Web Application for managing and scheduling background jobs.
-
-> **Project Status:** 🚧 In Progress (Approximately 70% Complete)
+A Java Web Application that automates job scheduling and execution. The system allows administrators to create, schedule, monitor, and manage background jobs. Jobs are executed automatically at the scheduled date and time, and execution details are stored in a job history log.
 
 ---
 
 ## 📌 Project Overview
 
-Background Job Scheduler is a web-based application developed using Java Servlets, JSP, JDBC, MySQL, Maven, and Apache Tomcat.
-
-The application provides user authentication, session management, an admin dashboard, and user management. The remaining modules will implement job scheduling, execution, monitoring, and reporting.
+The **Background Job Scheduler System** is developed using **Java, JSP, Servlets, JDBC, MySQL, Maven, and Apache Tomcat**. It provides an easy-to-use interface for managing scheduled jobs and automatically executes pending jobs using a background scheduler.
 
 ---
 
-# 🛠 Technologies Used
+## ✨ Features
 
-- Java
+### 🔐 Authentication
+- User Login
+- User Logout
+- Session Management
+
+### 📊 Dashboard
+- Total Users
+- Total Jobs
+- Completed Jobs
+- Failed Jobs
+
+### 💼 Job Management
+- Add Job
+- Edit Job
+- Delete Job
+- View All Jobs
+- Schedule Date & Time
+- Execution Status
+
+### ⏰ Background Scheduler
+- Runs automatically every 10 seconds
+- Detects pending jobs
+- Executes scheduled jobs
+- Updates execution status automatically
+
+### 📜 Job History
+- Stores execution logs
+- Displays execution history
+- Shows execution time, status, and result
+
+---
+
+## 🛠️ Technologies Used
+
+### Frontend
 - JSP
-- Servlets
-- JDBC
-- Maven
-- MySQL
-- Apache Tomcat 10
-- Bootstrap 5
 - HTML
 - CSS
-- Git & GitHub
+- Bootstrap 5
+- Bootstrap Icons
 
----
+### Backend
+- Java
+- Jakarta Servlet
+- JDBC
 
-# 📂 Project Structure
+### Database
+- MySQL
 
-```
-src
- ├── main
- │    ├── java
- │    │      └── com.vaishnavi
- │    │             ├── controller
- │    │             ├── dao
- │    │             ├── model
- │    │             ├── util
- │    │             └── test
- │    │
- │    └── webapp
- │           ├── jsp
- │           ├── components
- │           └── WEB-INF
- │
-pom.xml
-```
-
----
-
-# ✅ Completed Modules
-
-- Project Setup
-- Maven Configuration
-- MySQL Database Connection
-- User Registration
-- Login
-- Logout
-- Session Management
-- Dashboard
-- User Management
-    - Add User
-    - View Users
-    - Edit User
-    - Delete User
-- MVC Architecture
-- Bootstrap UI
-- GitHub Repository
-
----
-
-# 🚧 Modules Under Development
-
-- Job Management
-- Background Job Scheduler
-- Job Execution
-- Job Monitoring
-- Job History
-- Reports
-- Dashboard Statistics
-- Search & Filters
-- Final UI Improvements
-
----
-
-# 📊 Current Progress
-
-| Module | Status |
-|---------|--------|
-| Authentication | ✅ Completed |
-| Dashboard | ✅ Completed |
-| User Management | ✅ Completed |
-| MVC Architecture | ✅ Completed |
-| Job Management | 🚧 In Progress |
-| Scheduler | ⏳ Pending |
-| Reports | ⏳ Pending |
-
----
-
-# ▶️ How to Run the Project
-
-## Prerequisites
-
-- Java JDK 17+
+### Server
 - Apache Tomcat 10
-- MySQL 8+
+
+### Build Tool
 - Maven
+
+### IDE
 - IntelliJ IDEA
 
 ---
 
-## Steps
-
-1. Clone the repository
+## 📂 Project Structure
 
 ```
-git clone https://github.com/code-with-vaishnavi/BackgroundJobScheduler.git
+BackgroundJobScheduler
+│
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   ├── controller
+│   │   │   ├── dao
+│   │   │   ├── model
+│   │   │   ├── scheduler
+│   │   │   └── util
+│   │   │
+│   │   └── webapp
+│   │       ├── jsp
+│   │       ├── css
+│   │       └── WEB-INF
+│
+├── pom.xml
+└── README.md
 ```
 
-2. Open the project in IntelliJ IDEA.
+---
 
-3. Import Maven dependencies.
+## 🗄️ Database Tables
 
-4. Create the MySQL database.
+### Users
+- User ID
+- Full Name
+- Email
+- Password
+- Role
 
-5. Update database credentials in:
+### Jobs
+- Job ID
+- Job Name
+- Description
+- Job Type
+- Job Status
+- Schedule Date
+- Schedule Time
+- Execution Status
+
+### Job History
+- History ID
+- Job ID
+- Job Name
+- Execution Time
+- Status
+- Result
+
+---
+
+## 🔄 Project Workflow
+
+```
+User Login
+      │
+      ▼
+Dashboard
+      │
+      ▼
+Create Job
+      │
+      ▼
+Save in Database
+      │
+      ▼
+Scheduler Checks Every 10 Seconds
+      │
+      ▼
+Scheduled Time Reached
+      │
+      ▼
+Execute Job
+      │
+      ▼
+Update Status → Completed
+      │
+      ▼
+Store Execution History
+      │
+      ▼
+View Job History
+```
+
+---
+
+## ▶️ How to Run the Project
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/BackgroundJobScheduler.git
+```
+
+### 2. Open the Project
+
+Open the project in **IntelliJ IDEA**.
+
+### 3. Configure MySQL
+
+- Create the database.
+- Import the SQL file.
+- Update database credentials in:
 
 ```
 DBConnection.java
 ```
 
-6. Start Apache Tomcat.
+### 4. Build the Project
 
-7. Run the project.
+Run:
 
-8. Open:
+```bash
+mvn clean
+```
+
+```bash
+mvn package
+```
+
+### 5. Deploy
+
+Copy the generated WAR file from the `target` folder into the **Tomcat webapps** directory.
+
+### 6. Start Apache Tomcat
+
+Start the Tomcat server.
+
+### 7. Open the Application
 
 ```
 http://localhost:8080/BackgroundJobScheduler-1.0-SNAPSHOT/
 ```
 
----
+### 8. Login
 
-# 💻 Current Features
-
-✔ Login
-
-✔ Logout
-
-✔ Session Management
-
-✔ Dashboard
-
-✔ User CRUD Operations
-
-✔ Responsive Bootstrap UI
-
-✔ GitHub Version Control
+Login using your registered user credentials.
 
 ---
 
-# 📅 Future Enhancements
+## 📸 Screenshots
 
-- Quartz Scheduler Integration
-- Background Job Execution
+You can add screenshots here:
+
+- Login Page
+- Dashboard
+- Job Management
+- Add Job
+- Job History
+
+---
+
+## 🚀 Future Enhancements
+
 - Email Notifications
-- Job Reports
-- Scheduler Logs
-- Dashboard Analytics
-- Search & Filter
-- Export Reports
+- Quartz Scheduler Integration
+- Search and Filter Jobs
+- Dashboard Charts
+- PDF Export
+- Excel Export
+- User Role Management
+- Analytics Dashboard
+- Responsive Admin Panel
 
 ---
 
-# 👨‍💻 Developer
+## 👨‍💻 Author
 
-**Vaishnavi**
+**Vaishnavi Girase**
 
-MCA - Master of Computer Applications 
+MCA (Master of computer Application)
 
 ---
 
-# 📌 Note
+## 📄 License
 
-This project is currently under active development. More modules will be added in upcoming updates.
+This project is developed for educational and learning purposes.
