@@ -35,7 +35,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", user);
 
             // Redirect to Dashboard
-            response.sendRedirect("jsp/dashboard.jsp");
+            response.sendRedirect(request.getContextPath() + "/DashboardServlet");
 
         } else {
 

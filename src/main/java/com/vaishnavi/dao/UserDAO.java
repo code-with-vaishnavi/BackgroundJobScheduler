@@ -1,7 +1,7 @@
 package com.vaishnavi.dao;
 
-import com.vaishnavi.model.User;
 import com.vaishnavi.util.DBConnection;
+import com.vaishnavi.model.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -1,8 +1,8 @@
 package com.vaishnavi.controller;
 
 import com.vaishnavi.dao.UserDAO;
-import com.vaishnavi.model.User;
 
+import com.vaishnavi.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
