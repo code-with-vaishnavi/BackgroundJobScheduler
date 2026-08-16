@@ -1,8 +1,21 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.vaishnavi.model.Job" %>
+<%@ page import="com.vaishnavi.model.User" %>
 
 <%
+    User loggedUser = (User) session.getAttribute("user");
+
+    if (loggedUser == null) {
+        response.sendRedirect(request.getContextPath() + "/jsp/login.jsp");
+        return;
+    }
+
     Job job = (Job) request.getAttribute("job");
+
+    if (job == null) {
+        response.sendRedirect(request.getContextPath() + "/JobServlet");
+        return;
+    }
 %>
 
 <!DOCTYPE html>
@@ -12,7 +25,8 @@
 
     <title>Edit Job</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
 </head>
 
@@ -30,15 +44,25 @@
 
         <div class="card-body">
 
-            <form action="<%=request.getContextPath()%>/JobServlet" method="post">
+            <form action="<%=request.getContextPath()%>/JobServlet"
+                  method="post">
 
-                <input type="hidden" name="action" value="update">
+                <input type="hidden"
+                       name="action"
+                       value="update">
 
-                <input type="hidden" name="jobId" value="<%=job.getJobId()%>">
+                <input type="hidden"
+                       name="jobId"
+                       value="<%=job.getJobId()%>">
+
+
+                <!-- Job Name -->
 
                 <div class="mb-3">
 
-                    <label class="form-label">Job Name</label>
+                    <label class="form-label">
+                        Job Name
+                    </label>
 
                     <input type="text"
                            class="form-control"
@@ -48,9 +72,14 @@
 
                 </div>
 
+
+                <!-- Description -->
+
                 <div class="mb-3">
 
-                    <label class="form-label">Description</label>
+                    <label class="form-label">
+                        Description
+                    </label>
 
                     <textarea class="form-control"
                               name="jobDescription"
@@ -59,9 +88,14 @@
 
                 </div>
 
+
+                <!-- Job Type -->
+
                 <div class="mb-3">
 
-                    <label class="form-label">Job Type</label>
+                    <label class="form-label">
+                        Job Type
+                    </label>
 
                     <input type="text"
                            class="form-control"
@@ -71,31 +105,48 @@
 
                 </div>
 
+
+                <!-- Job Status -->
+
                 <div class="mb-3">
 
-                    <label class="form-label">Job Status</label>
+                    <label class="form-label">
+                        Job Status
+                    </label>
 
-                    <select class="form-select" name="jobStatus">
+                    <select class="form-select"
+                            name="jobStatus">
 
                         <option value="Active"
-                            <%= "Active".equals(job.getJobStatus()) ? "selected" : "" %>>
+                            <%= "Active".equals(job.getJobStatus())
+                                    ? "selected" : "" %>>
                             Active
                         </option>
 
                         <option value="Inactive"
-                            <%= "Inactive".equals(job.getJobStatus()) ? "selected" : "" %>>
+                            <%= "Inactive".equals(job.getJobStatus())
+                                    ? "selected" : "" %>>
                             Inactive
+                        </option>
+
+                        <option value="Completed"
+                            <%= "Completed".equals(job.getJobStatus())
+                                    ? "selected" : "" %>>
+                            Completed
                         </option>
 
                     </select>
 
                 </div>
 
-                <!-- NEW -->
+
+                <!-- Schedule Date -->
 
                 <div class="mb-3">
 
-                    <label class="form-label">Schedule Date</label>
+                    <label class="form-label">
+                        Schedule Date
+                    </label>
 
                     <input type="date"
                            class="form-control"
@@ -105,9 +156,14 @@
 
                 </div>
 
+
+                <!-- Schedule Time -->
+
                 <div class="mb-3">
 
-                    <label class="form-label">Schedule Time</label>
+                    <label class="form-label">
+                        Schedule Time
+                    </label>
 
                     <input type="time"
                            class="form-control"
@@ -117,30 +173,39 @@
 
                 </div>
 
+
+                <!-- Execution Status -->
+
                 <div class="mb-3">
 
-                    <label class="form-label">Execution Status</label>
+                    <label class="form-label">
+                        Execution Status
+                    </label>
 
                     <select class="form-select"
                             name="executionStatus">
 
                         <option value="Pending"
-                            <%= "Pending".equals(job.getExecutionStatus()) ? "selected" : "" %>>
+                            <%= "Pending".equals(job.getExecutionStatus())
+                                    ? "selected" : "" %>>
                             Pending
                         </option>
 
                         <option value="Running"
-                            <%= "Running".equals(job.getExecutionStatus()) ? "selected" : "" %>>
+                            <%= "Running".equals(job.getExecutionStatus())
+                                    ? "selected" : "" %>>
                             Running
                         </option>
 
                         <option value="Completed"
-                            <%= "Completed".equals(job.getExecutionStatus()) ? "selected" : "" %>>
+                            <%= "Completed".equals(job.getExecutionStatus())
+                                    ? "selected" : "" %>>
                             Completed
                         </option>
 
                         <option value="Failed"
-                            <%= "Failed".equals(job.getExecutionStatus()) ? "selected" : "" %>>
+                            <%= "Failed".equals(job.getExecutionStatus())
+                                    ? "selected" : "" %>>
                             Failed
                         </option>
 
@@ -148,13 +213,22 @@
 
                 </div>
 
-                <button class="btn btn-success">
+
+                <!-- Buttons -->
+
+                <button type="submit"
+                        class="btn btn-success">
+
                     Update Job
+
                 </button>
+
 
                 <a href="<%=request.getContextPath()%>/JobServlet"
                    class="btn btn-secondary">
+
                     Cancel
+
                 </a>
 
             </form>

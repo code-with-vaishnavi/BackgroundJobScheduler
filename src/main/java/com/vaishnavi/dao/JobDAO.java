@@ -16,7 +16,10 @@ public class JobDAO {
 
         boolean status = false;
 
-        String sql = "INSERT INTO jobs(job_name,job_description,job_type,job_status,schedule_date,schedule_time,execution_status) VALUES(?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO jobs " +
+                "(job_name, job_description, job_type, job_status, " +
+                "schedule_date, schedule_time, execution_status, user_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
 
@@ -33,6 +36,9 @@ public class JobDAO {
             ps.setTime(6, job.getScheduleTime());
             ps.setString(7, job.getExecutionStatus());
 
+            // IMPORTANT: save logged-in user's ID
+            ps.setInt(8, job.getUserId());
+
             int row = ps.executeUpdate();
 
             if (row > 0) {
@@ -40,7 +46,9 @@ public class JobDAO {
             }
 
         } catch (Exception e) {
+
             e.printStackTrace();
+
         }
 
         return status;
@@ -48,6 +56,7 @@ public class JobDAO {
 
 
     // ================== GET ALL JOBS ==================
+    // ADMIN USES THIS
     public List<Job> getAllJobs() {
 
         List<Job> jobList = new ArrayList<>();
@@ -74,6 +83,10 @@ public class JobDAO {
                 job.setScheduleDate(rs.getDate("schedule_date"));
                 job.setScheduleTime(rs.getTime("schedule_time"));
                 job.setExecutionStatus(rs.getString("execution_status"));
+                job.setUserId(rs.getInt("user_id"));
+
+                // NEW
+                job.setUserId(rs.getInt("user_id"));
 
                 jobList.add(job);
             }
@@ -83,9 +96,53 @@ public class JobDAO {
         }
 
         return jobList;
-
-
     }
+
+
+    // ================== GET JOBS BY USER ==================
+    // USER USES THIS
+    public List<Job> getJobsByUserId(int userId) {
+
+        List<Job> jobList = new ArrayList<>();
+
+        String sql = "SELECT * FROM jobs WHERE user_id=?";
+
+        try {
+
+            Connection con = DBConnection.getConnection();
+
+            PreparedStatement ps = con.prepareStatement(sql);
+
+            ps.setInt(1, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Job job = new Job();
+
+                job.setJobId(rs.getInt("job_id"));
+                job.setJobName(rs.getString("job_name"));
+                job.setJobDescription(rs.getString("job_description"));
+                job.setJobType(rs.getString("job_type"));
+                job.setJobStatus(rs.getString("job_status"));
+                job.setScheduleDate(rs.getDate("schedule_date"));
+                job.setScheduleTime(rs.getTime("schedule_time"));
+                job.setExecutionStatus(rs.getString("execution_status"));
+
+                job.setUserId(rs.getInt("user_id"));
+
+                jobList.add(job);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return jobList;
+    }
+
+
     // ================== GET JOB BY ID ==================
     public Job getJobById(int jobId) {
 
@@ -112,23 +169,49 @@ public class JobDAO {
                 job.setJobDescription(rs.getString("job_description"));
                 job.setJobType(rs.getString("job_type"));
                 job.setJobStatus(rs.getString("job_status"));
-                job.setScheduleDate(rs.getDate("schedule_date"));
-                job.setScheduleTime(rs.getTime("schedule_time"));
-                job.setExecutionStatus(rs.getString("execution_status"));
+
+                job.setScheduleDate(
+                        rs.getDate("schedule_date")
+                );
+
+                job.setScheduleTime(
+                        rs.getTime("schedule_time")
+                );
+
+                job.setExecutionStatus(
+                        rs.getString("execution_status")
+                );
+
+                // IMPORTANT: Job owner
+                job.setUserId(
+                        rs.getInt("user_id")
+                );
             }
 
         } catch (Exception e) {
+
             e.printStackTrace();
+
         }
 
         return job;
     }
+
+
     // ================== UPDATE JOB ==================
     public boolean updateJob(Job job) {
 
         boolean status = false;
 
-        String sql = "UPDATE jobs SET job_name=?, job_description=?, job_type=?, job_status=?, schedule_date=?, schedule_time=?, execution_status=? WHERE job_id=?";
+        String sql = "UPDATE jobs SET " +
+                "job_name=?, " +
+                "job_description=?, " +
+                "job_type=?, " +
+                "job_status=?, " +
+                "schedule_date=?, " +
+                "schedule_time=?, " +
+                "execution_status=? " +
+                "WHERE job_id=?";
 
         try {
 
@@ -140,11 +223,9 @@ public class JobDAO {
             ps.setString(2, job.getJobDescription());
             ps.setString(3, job.getJobType());
             ps.setString(4, job.getJobStatus());
-
             ps.setDate(5, job.getScheduleDate());
             ps.setTime(6, job.getScheduleTime());
             ps.setString(7, job.getExecutionStatus());
-
             ps.setInt(8, job.getJobId());
 
             int row = ps.executeUpdate();
@@ -159,6 +240,8 @@ public class JobDAO {
 
         return status;
     }
+
+
     // ================== DELETE JOB ==================
     public boolean deleteJob(int jobId) {
 
@@ -186,6 +269,8 @@ public class JobDAO {
 
         return status;
     }
+
+
     // ================== TOTAL JOBS ==================
     public int getTotalJobs() {
 
@@ -212,12 +297,14 @@ public class JobDAO {
         return count;
     }
 
+
     // ================== UPDATE EXECUTION STATUS ==================
     public boolean updateExecutionStatus(int jobId, String status) {
 
         boolean result = false;
 
-        String sql = "UPDATE jobs SET execution_status=? WHERE job_id=?";
+        String sql =
+                "UPDATE jobs SET execution_status=? WHERE job_id=?";
 
         try {
 
@@ -240,6 +327,8 @@ public class JobDAO {
 
         return result;
     }
+
+
     // ================== PENDING JOBS ==================
     public int getPendingJobs() {
 
@@ -250,25 +339,23 @@ public class JobDAO {
             Connection con = DBConnection.getConnection();
 
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT COUNT(*) FROM jobs WHERE execution_status='Pending'");
+                    "SELECT COUNT(*) FROM jobs " +
+                            "WHERE execution_status='Pending'"
+            );
 
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-
                 count = rs.getInt(1);
-
             }
 
         } catch (Exception e) {
-
             e.printStackTrace();
-
         }
 
         return count;
-
     }
+
 
     // ================== COMPLETED JOBS ==================
     public int getCompletedJobs() {
@@ -280,25 +367,23 @@ public class JobDAO {
             Connection con = DBConnection.getConnection();
 
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT COUNT(*) FROM jobs WHERE execution_status='Completed'");
+                    "SELECT COUNT(*) FROM jobs " +
+                            "WHERE execution_status='Completed'"
+            );
 
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-
                 count = rs.getInt(1);
-
             }
 
         } catch (Exception e) {
-
             e.printStackTrace();
-
         }
 
         return count;
-
     }
+
 
     // ================== FAILED JOBS ==================
     public int getFailedJobs() {
@@ -310,23 +395,21 @@ public class JobDAO {
             Connection con = DBConnection.getConnection();
 
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT COUNT(*) FROM jobs WHERE execution_status='Failed'");
+                    "SELECT COUNT(*) FROM jobs " +
+                            "WHERE execution_status='Failed'"
+            );
 
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-
                 count = rs.getInt(1);
-
             }
 
         } catch (Exception e) {
-
             e.printStackTrace();
-
         }
 
         return count;
-
     }
+
 }

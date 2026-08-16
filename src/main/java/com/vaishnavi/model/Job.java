@@ -1,4 +1,5 @@
 package com.vaishnavi.model;
+
 import java.sql.Date;
 import java.sql.Time;
 
@@ -13,16 +14,29 @@ public class Job {
     private Time scheduleTime;
     private String executionStatus;
 
+    // IMPORTANT: Job owner
+    private int userId;
+
+
     public Job() {
     }
 
-    public Job(int jobId, String jobName, String jobDescription, String jobType, String jobStatus) {
+
+    public Job(int jobId,
+               String jobName,
+               String jobDescription,
+               String jobType,
+               String jobStatus) {
+
         this.jobId = jobId;
         this.jobName = jobName;
         this.jobDescription = jobDescription;
         this.jobType = jobType;
         this.jobStatus = jobStatus;
     }
+
+
+    // ================= JOB ID =================
 
     public int getJobId() {
         return jobId;
@@ -32,6 +46,9 @@ public class Job {
         this.jobId = jobId;
     }
 
+
+    // ================= JOB NAME =================
+
     public String getJobName() {
         return jobName;
     }
@@ -39,6 +56,9 @@ public class Job {
     public void setJobName(String jobName) {
         this.jobName = jobName;
     }
+
+
+    // ================= DESCRIPTION =================
 
     public String getJobDescription() {
         return jobDescription;
@@ -48,6 +68,9 @@ public class Job {
         this.jobDescription = jobDescription;
     }
 
+
+    // ================= JOB TYPE =================
+
     public String getJobType() {
         return jobType;
     }
@@ -55,6 +78,9 @@ public class Job {
     public void setJobType(String jobType) {
         this.jobType = jobType;
     }
+
+
+    // ================= JOB STATUS =================
 
     public String getJobStatus() {
         return jobStatus;
@@ -64,6 +90,9 @@ public class Job {
         this.jobStatus = jobStatus;
     }
 
+
+    // ================= SCHEDULE DATE =================
+
     public Date getScheduleDate() {
         return scheduleDate;
     }
@@ -71,6 +100,9 @@ public class Job {
     public void setScheduleDate(Date scheduleDate) {
         this.scheduleDate = scheduleDate;
     }
+
+
+    // ================= SCHEDULE TIME =================
 
     public Time getScheduleTime() {
         return scheduleTime;
@@ -80,6 +112,9 @@ public class Job {
         this.scheduleTime = scheduleTime;
     }
 
+
+    // ================= EXECUTION STATUS =================
+
     public String getExecutionStatus() {
         return executionStatus;
     }
@@ -87,4 +122,17 @@ public class Job {
     public void setExecutionStatus(String executionStatus) {
         this.executionStatus = executionStatus;
     }
+
+
+    // ================= USER ID =================
+    // IMPORTANT FOR USER/ADMIN SEPARATION
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
 }
