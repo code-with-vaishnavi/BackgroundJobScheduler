@@ -1,7 +1,9 @@
 package com.vaishnavi.controller;
 
 import com.vaishnavi.dao.JobDAO;
+import com.vaishnavi.dao.JobHistoryDAO;
 import com.vaishnavi.model.Job;
+import com.vaishnavi.model.JobHistory;
 import com.vaishnavi.model.User;
 
 import jakarta.servlet.ServletException;
@@ -12,19 +14,32 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 
 @WebServlet("/JobServlet")
 public class JobServlet extends HttpServlet {
 
     private JobDAO jobDAO;
+    private JobHistoryDAO historyDAO;
+
+
+    // ==================================================
+    // INIT
+    // ==================================================
 
     @Override
     public void init() {
+
         jobDAO = new JobDAO();
+        historyDAO = new JobHistoryDAO();
     }
 
-    // ================= GET =================
+
+    // ==================================================
+    // GET
+    // ==================================================
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response)
@@ -32,20 +47,28 @@ public class JobServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        // User must be logged in
-        if (session == null || session.getAttribute("user") == null) {
+
+        // ==================================================
+        // USER MUST BE LOGGED IN
+        // ==================================================
+
+        if (session == null
+                || session.getAttribute("user") == null) {
 
             response.sendRedirect(
-                    request.getContextPath() + "/login.jsp"
+                    request.getContextPath()
+                            + "/jsp/login.jsp"
             );
 
             return;
         }
 
+
         User loggedUser =
                 (User) session.getAttribute("user");
 
-        String role = loggedUser.getRole();
+        String role =
+                loggedUser.getRole();
 
         String action =
                 request.getParameter("action");
@@ -59,6 +82,7 @@ public class JobServlet extends HttpServlet {
 
             List<Job> jobList;
 
+
             // ADMIN → ALL JOBS
             if ("ADMIN".equalsIgnoreCase(role)) {
 
@@ -69,15 +93,18 @@ public class JobServlet extends HttpServlet {
             // USER → ONLY THEIR JOBS
             else {
 
-                jobList = jobDAO.getJobsByUserId(
-                        loggedUser.getUserId()
-                );
+                jobList =
+                        jobDAO.getJobsByUserId(
+                                loggedUser.getUserId()
+                        );
             }
+
 
             request.setAttribute(
                     "jobList",
                     jobList
             );
+
 
             request.getRequestDispatcher(
                     "/jsp/jobs.jsp"
@@ -95,6 +122,7 @@ public class JobServlet extends HttpServlet {
                     Integer.parseInt(
                             request.getParameter("id")
                     );
+
 
             Job job =
                     jobDAO.getJobById(jobId);
@@ -128,6 +156,7 @@ public class JobServlet extends HttpServlet {
                     "job",
                     job
             );
+
 
             request.getRequestDispatcher(
                     "/jsp/editJob.jsp"
@@ -197,7 +226,9 @@ public class JobServlet extends HttpServlet {
                     );
 
 
+            // ==================================================
             // GET JOB
+            // ==================================================
 
             Job job =
                     jobDAO.getJobById(jobId);
@@ -267,10 +298,49 @@ public class JobServlet extends HttpServlet {
 
                 Thread.currentThread().interrupt();
 
+
+                // ==================================================
+                // CHANGE STATUS → FAILED
+                // ==================================================
+
                 jobDAO.updateExecutionStatus(
                         jobId,
                         "Failed"
                 );
+
+
+                // ==================================================
+                // SAVE FAILED HISTORY
+                // ==================================================
+
+                JobHistory history =
+                        new JobHistory();
+
+                history.setJobId(
+                        job.getJobId()
+                );
+
+                history.setJobName(
+                        job.getJobName()
+                );
+
+                history.setExecutionTime(
+                        new Timestamp(
+                                System.currentTimeMillis()
+                        )
+                );
+
+                history.setStatus(
+                        "Failed"
+                );
+
+                history.setResult(
+                        "Job execution interrupted."
+                );
+
+
+                historyDAO.addHistory(history);
+
 
                 response.sendRedirect(
                         request.getContextPath()
@@ -292,6 +362,46 @@ public class JobServlet extends HttpServlet {
 
 
             // ==================================================
+            // SAVE SUCCESSFUL JOB HISTORY
+            // ==================================================
+
+            JobHistory history =
+                    new JobHistory();
+
+
+            history.setJobId(
+                    job.getJobId()
+            );
+
+
+            history.setJobName(
+                    job.getJobName()
+            );
+
+
+            history.setExecutionTime(
+                    new Timestamp(
+                            System.currentTimeMillis()
+                    )
+            );
+
+
+            history.setStatus(
+                    "Completed"
+            );
+
+
+            history.setResult(
+                    "Success"
+            );
+
+
+            // INSERT HISTORY INTO DATABASE
+
+            historyDAO.addHistory(history);
+
+
+            // ==================================================
             // BACK TO JOB LIST
             // ==================================================
 
@@ -303,7 +413,9 @@ public class JobServlet extends HttpServlet {
     }
 
 
-    // ================= POST =================
+    // ==================================================
+    // POST
+    // ==================================================
 
     @Override
     protected void doPost(HttpServletRequest request,
@@ -314,14 +426,16 @@ public class JobServlet extends HttpServlet {
                 request.getSession(false);
 
 
-        // User must be logged in
+        // ==================================================
+        // USER MUST BE LOGGED IN
+        // ==================================================
 
         if (session == null
                 || session.getAttribute("user") == null) {
 
             response.sendRedirect(
                     request.getContextPath()
-                            + "/login.jsp"
+                            + "/jsp/login.jsp"
             );
 
             return;
@@ -350,22 +464,30 @@ public class JobServlet extends HttpServlet {
 
 
             job.setJobName(
-                    request.getParameter("jobName")
+                    request.getParameter(
+                            "jobName"
+                    )
             );
 
 
             job.setJobDescription(
-                    request.getParameter("jobDescription")
+                    request.getParameter(
+                            "jobDescription"
+                    )
             );
 
 
             job.setJobType(
-                    request.getParameter("jobType")
+                    request.getParameter(
+                            "jobType"
+                    )
             );
 
 
             job.setJobStatus(
-                    request.getParameter("jobStatus")
+                    request.getParameter(
+                            "jobStatus"
+                    )
             );
 
 

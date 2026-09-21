@@ -16,7 +16,10 @@ public class JobHistoryDAO {
 
         boolean status = false;
 
-        String sql = "INSERT INTO job_history(job_id,job_name,execution_time,status,result) VALUES(?,?,?,?,?)";
+        String sql =
+                "INSERT INTO job_history " +
+                        "(job_id, job_name, execution_time, status, result) " +
+                        "VALUES (?, ?, ?, ?, ?)";
 
         try {
 
@@ -36,19 +39,28 @@ public class JobHistoryDAO {
                 status = true;
             }
 
+            ps.close();
+            con.close();
+
         } catch (Exception e) {
+
             e.printStackTrace();
         }
 
         return status;
     }
 
+
     // ================== GET ALL HISTORY ==================
     public List<JobHistory> getAllHistory() {
 
         List<JobHistory> historyList = new ArrayList<>();
 
-        String sql = "SELECT * FROM job_history ORDER BY execution_time DESC";
+        String sql =
+                "SELECT history_id, job_id, job_name, " +
+                        "execution_time, status, result " +
+                        "FROM job_history " +
+                        "ORDER BY execution_time DESC";
 
         try {
 
@@ -62,19 +74,48 @@ public class JobHistoryDAO {
 
                 JobHistory history = new JobHistory();
 
-                history.setHistoryId(rs.getInt("history_id"));
-                history.setJobName(rs.getString("job_name"));
-                history.setExecutionTime(rs.getTimestamp("execution_time"));
-                history.setStatus(rs.getString("status"));
+                // History ID
+                history.setHistoryId(
+                        rs.getInt("history_id")
+                );
+
+                // IMPORTANT: Job ID
+                history.setJobId(
+                        rs.getInt("job_id")
+                );
+
+                // Job Name
+                history.setJobName(
+                        rs.getString("job_name")
+                );
+
+                // Execution Time
+                history.setExecutionTime(
+                        rs.getTimestamp("execution_time")
+                );
+
+                // Status
+                history.setStatus(
+                        rs.getString("status")
+                );
+
+                // IMPORTANT: Result
+                history.setResult(
+                        rs.getString("result")
+                );
 
                 historyList.add(history);
             }
 
+            rs.close();
+            ps.close();
+            con.close();
+
         } catch (Exception e) {
+
             e.printStackTrace();
         }
 
         return historyList;
     }
-
 }
