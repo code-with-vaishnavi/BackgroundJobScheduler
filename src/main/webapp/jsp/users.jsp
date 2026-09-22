@@ -15,7 +15,8 @@
 
     <title>User Management</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
 </head>
 
@@ -27,11 +28,15 @@
 
         <h2>User Management</h2>
 
-        <a href="<%= request.getContextPath() %>/jsp/addUser.jsp" class="btn btn-success">
+        <a href="<%= request.getContextPath() %>/jsp/addUser.jsp"
+           class="btn btn-success">
+
             + Add User
+
         </a>
 
     </div>
+
 
     <table class="table table-bordered table-hover table-striped shadow">
 
@@ -49,6 +54,7 @@
 
         </thead>
 
+
         <tbody>
 
         <%
@@ -59,16 +65,24 @@
 
         <tr>
 
-            <td><%= user.getUserId() %></td>
+            <td>
+                <%= user.getUserId() %>
+            </td>
 
-            <td><%= user.getFullName() %></td>
+            <td>
+                <%= user.getFullName() %>
+            </td>
 
-            <td><%= user.getEmail() %></td>
+            <td>
+                <%= user.getEmail() %>
+            </td>
 
             <td>
 
                 <span class="badge bg-primary">
+
                     <%= user.getRole() %>
+
                 </span>
 
             </td>
@@ -118,9 +132,12 @@
 
     </table>
 
+
+    <!-- Back to Admin Dashboard -->
+
     <div class="mt-3">
 
-        <a href="<%= request.getContextPath() %>/jsp/dashboard.jsp"
+        <a href="<%= request.getContextPath() %>/AdminDashboardServlet"
            class="btn btn-secondary">
 
             ← Back to Dashboard
@@ -130,6 +147,7 @@
     </div>
 
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

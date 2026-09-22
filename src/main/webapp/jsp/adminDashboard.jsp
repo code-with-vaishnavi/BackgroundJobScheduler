@@ -241,15 +241,16 @@
             </a>
 
 
-            <!-- User Management will be added next -->
+            <!-- User Management -->
 
-            <button class="btn btn-secondary" disabled>
+            <a href="<%=request.getContextPath()%>/UserServlet"
+               class="btn btn-secondary">
 
                 <i class="bi bi-people-fill"></i>
 
-                User Management - Coming Next
+                User Management
 
-            </button>
+            </a>
 
         </div>
 

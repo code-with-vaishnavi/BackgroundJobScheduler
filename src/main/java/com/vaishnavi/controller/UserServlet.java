@@ -1,13 +1,14 @@
 package com.vaishnavi.controller;
 
 import com.vaishnavi.dao.UserDAO;
-
 import com.vaishnavi.model.User;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,117 +23,320 @@ public class UserServlet extends HttpServlet {
         userDAO = new UserDAO();
     }
 
-    // ================= GET REQUEST =================
-    @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
-            throws ServletException, IOException {
+    // ==================================================
+    // ADMIN ACCESS CHECK
+    // ==================================================
 
-        String action = request.getParameter("action");
+    private boolean isAdmin(HttpServletRequest request) {
 
-        // Delete User
-        if ("delete".equals(action)) {
+        HttpSession session = request.getSession(false);
 
-            int userId = Integer.parseInt(request.getParameter("id"));
-
-            userDAO.deleteUser(userId);
-
-            response.sendRedirect("UserServlet");
-            return;
+        if (session == null) {
+            return false;
         }
 
-        // Edit User
-        if ("edit".equals(action)) {
+        User loggedInUser =
+                (User) session.getAttribute("user");
 
-            int userId = Integer.parseInt(request.getParameter("id"));
-
-            User user = userDAO.getUserById(userId);
-
-            request.setAttribute("user", user);
-
-            request.getRequestDispatcher("jsp/editUser.jsp")
-                    .forward(request, response);
-
-            return;
+        if (loggedInUser == null) {
+            return false;
         }
 
-        // Show User List
-        List<User> userList = userDAO.getAllUsers();
-
-        request.setAttribute("userList", userList);
-
-        request.getRequestDispatcher("jsp/users.jsp")
-                .forward(request, response);
+        return "ADMIN".equalsIgnoreCase(
+                loggedInUser.getRole()
+        );
     }
 
-    // ================= POST REQUEST =================
+    // ==================================================
+    // GET REQUEST
+    // ==================================================
+
     @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response)
+    protected void doGet(
+            HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
 
-        String action = request.getParameter("action");
+        // ==================================================
+        // ADMIN ONLY
+        // ==================================================
 
-        // ================= UPDATE USER =================
+        if (!isAdmin(request)) {
 
-        if ("update".equals(action)) {
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/jsp/login.jsp"
+            );
 
-            int userId = Integer.parseInt(request.getParameter("userId"));
+            return;
+        }
 
-            String fullName = request.getParameter("fullName");
-            String email = request.getParameter("email");
-            String password = request.getParameter("password");
-            String role = request.getParameter("role");
+        String action =
+                request.getParameter("action");
 
-            User user = new User();
+        // ==================================================
+        // DELETE USER
+        // ==================================================
 
-            user.setUserId(userId);
-            user.setFullName(fullName);
-            user.setEmail(email);
-            user.setPassword(password);
-            user.setRole(role);
+        if ("delete".equals(action)) {
 
-            boolean status = userDAO.updateUser(user);
+            String id =
+                    request.getParameter("id");
 
-            if (status) {
+            if (id != null) {
 
-                response.sendRedirect("UserServlet");
+                try {
+
+                    int userId =
+                            Integer.parseInt(id);
+
+                    userDAO.deleteUser(userId);
+
+                } catch (NumberFormatException e) {
+
+                    e.printStackTrace();
+                }
+            }
+
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/UserServlet"
+            );
+
+            return;
+        }
+
+        // ==================================================
+        // EDIT USER
+        // ==================================================
+
+        if ("edit".equals(action)) {
+
+            String id =
+                    request.getParameter("id");
+
+            if (id != null) {
+
+                try {
+
+                    int userId =
+                            Integer.parseInt(id);
+
+                    User user =
+                            userDAO.getUserById(userId);
+
+                    request.setAttribute(
+                            "user",
+                            user
+                    );
+
+                    request.getRequestDispatcher(
+                            "/jsp/editUser.jsp"
+                    ).forward(
+                            request,
+                            response
+                    );
+
+                } catch (NumberFormatException e) {
+
+                    e.printStackTrace();
+
+                    response.sendRedirect(
+                            request.getContextPath()
+                                    + "/UserServlet"
+                    );
+                }
 
             } else {
 
-                response.getWriter().println("<h2>User Update Failed!</h2>");
-
+                response.sendRedirect(
+                        request.getContextPath()
+                                + "/UserServlet"
+                );
             }
 
             return;
         }
 
-        // ================= ADD USER =================
+        // ==================================================
+        // SHOW USER LIST
+        // ==================================================
 
-        String fullName = request.getParameter("fullName");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        String role = request.getParameter("role");
+        List<User> userList =
+                userDAO.getAllUsers();
 
-        User user = new User();
+        request.setAttribute(
+                "userList",
+                userList
+        );
+
+        request.getRequestDispatcher(
+                "/jsp/users.jsp"
+        ).forward(
+                request,
+                response
+        );
+    }
+
+    // ==================================================
+    // POST REQUEST
+    // ==================================================
+
+    @Override
+    protected void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
+
+        // ==================================================
+        // ADMIN ONLY
+        // ==================================================
+
+        if (!isAdmin(request)) {
+
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/jsp/login.jsp"
+            );
+
+            return;
+        }
+
+        String action =
+                request.getParameter("action");
+
+        // ==================================================
+        // UPDATE USER
+        // ==================================================
+
+        if ("update".equals(action)) {
+
+            String userIdParameter =
+                    request.getParameter("userId");
+
+            if (userIdParameter == null) {
+
+                response.sendRedirect(
+                        request.getContextPath()
+                                + "/UserServlet"
+                );
+
+                return;
+            }
+
+            try {
+
+                int userId =
+                        Integer.parseInt(
+                                userIdParameter
+                        );
+
+                String fullName =
+                        request.getParameter(
+                                "fullName"
+                        );
+
+                String email =
+                        request.getParameter(
+                                "email"
+                        );
+
+                String password =
+                        request.getParameter(
+                                "password"
+                        );
+
+                String role =
+                        request.getParameter(
+                                "role"
+                        );
+
+                User user =
+                        new User();
+
+                user.setUserId(userId);
+                user.setFullName(fullName);
+                user.setEmail(email);
+                user.setPassword(password);
+                user.setRole(role);
+
+                boolean status =
+                        userDAO.updateUser(user);
+
+                if (status) {
+
+                    response.sendRedirect(
+                            request.getContextPath()
+                                    + "/UserServlet"
+                    );
+
+                } else {
+
+                    response.getWriter().println(
+                            "<h2>User Update Failed!</h2>"
+                    );
+                }
+
+            } catch (NumberFormatException e) {
+
+                e.printStackTrace();
+
+                response.sendRedirect(
+                        request.getContextPath()
+                                + "/UserServlet"
+                );
+            }
+
+            return;
+        }
+
+        // ==================================================
+        // ADD USER
+        // ==================================================
+
+        String fullName =
+                request.getParameter(
+                        "fullName"
+                );
+
+        String email =
+                request.getParameter(
+                        "email"
+                );
+
+        String password =
+                request.getParameter(
+                        "password"
+                );
+
+        String role =
+                request.getParameter(
+                        "role"
+                );
+
+        User user =
+                new User();
 
         user.setFullName(fullName);
         user.setEmail(email);
         user.setPassword(password);
         user.setRole(role);
 
-        boolean status = userDAO.registerUser(user);
+        boolean status =
+                userDAO.registerUser(user);
 
         if (status) {
 
-            response.sendRedirect("UserServlet");
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/UserServlet"
+            );
 
         } else {
 
-            response.getWriter().println("<h2>User Registration Failed!</h2>");
-
+            response.getWriter().println(
+                    "<h2>User Registration Failed!</h2>"
+            );
         }
-
     }
-
 }

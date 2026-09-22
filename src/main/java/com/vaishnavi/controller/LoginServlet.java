@@ -2,6 +2,7 @@ package com.vaishnavi.controller;
 
 import com.vaishnavi.dao.UserDAO;
 import com.vaishnavi.model.User;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,41 +16,75 @@ import java.io.IOException;
 public class LoginServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response)
+    protected void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
 
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
+        String email =
+                request.getParameter("email");
 
-        UserDAO dao = new UserDAO();
+        String password =
+                request.getParameter("password");
 
-        User user = dao.loginUser(email, password);
+
+        UserDAO dao =
+                new UserDAO();
+
+        User user =
+                dao.loginUser(
+                        email,
+                        password
+                );
+
 
         if (user != null) {
 
-            // Create Session
-            HttpSession session = request.getSession();
+            // ==========================================
+            // CREATE SESSION
+            // ==========================================
 
-            // Store logged-in user
-            session.setAttribute("user", user);
+            HttpSession session =
+                    request.getSession();
 
-            // Redirect to Dashboard
-            if (user.getRole().equalsIgnoreCase("ADMIN")) {
 
-                response.sendRedirect(request.getContextPath() + "/AdminDashboardServlet");
+            // ==========================================
+            // STORE LOGGED-IN USER
+            // ==========================================
+
+            session.setAttribute(
+                    "user",
+                    user
+            );
+
+
+            // ==========================================
+            // ROLE-BASED REDIRECT
+            // ==========================================
+
+            if ("ADMIN".equalsIgnoreCase(
+                    user.getRole()
+            )) {
+
+                response.sendRedirect(
+                        request.getContextPath()
+                                + "/AdminDashboardServlet"
+                );
 
             } else {
 
-                response.sendRedirect(request.getContextPath() + "/UserDashboardServlet");
-
+                response.sendRedirect(
+                        request.getContextPath()
+                                + "/UserDashboardServlet"
+                );
             }
+
 
         } else {
 
-            response.getWriter().println("<h2>Invalid Email or Password</h2>");
-
+            response.getWriter().println(
+                    "<h2>Invalid Email or Password</h2>"
+            );
         }
-
     }
 }
