@@ -37,7 +37,6 @@ public class SchedulerService {
         System.out.println("Check Interval: 10 seconds");
         System.out.println("================================");
 
-
         scheduler.scheduleAtFixedRate(
                 this::checkPendingJobs,
                 0,
@@ -58,37 +57,30 @@ public class SchedulerService {
         System.out.println("Checking Pending Jobs...");
         System.out.println("================================");
 
-
         try {
 
             List<Job> jobs =
                     jobDAO.getAllJobs();
-
 
             System.out.println(
                     "Total Jobs Found : "
                             + jobs.size()
             );
 
-
             Date today =
                     Date.valueOf(
                             LocalDate.now()
                     );
 
-
             Time now =
                     Time.valueOf(
-                            LocalTime.now()
-                                    .withNano(0)
+                            LocalTime.now().withNano(0)
                     );
-
 
             System.out.println(
                     "Today's Date : "
                             + today
             );
-
 
             System.out.println(
                     "Current Time : "
@@ -102,30 +94,25 @@ public class SchedulerService {
                         "--------------------------------"
                 );
 
-
                 System.out.println(
                         "Job ID : "
                                 + job.getJobId()
                 );
-
 
                 System.out.println(
                         "Job Name : "
                                 + job.getJobName()
                 );
 
-
                 System.out.println(
                         "Execution Status : "
                                 + job.getExecutionStatus()
                 );
 
-
                 System.out.println(
                         "Schedule Date : "
                                 + job.getScheduleDate()
                 );
-
 
                 System.out.println(
                         "Schedule Time : "
@@ -139,7 +126,6 @@ public class SchedulerService {
 
                 String executionStatus =
                         job.getExecutionStatus();
-
 
                 if (executionStatus == null
                         || !"Pending".equalsIgnoreCase(
@@ -184,7 +170,6 @@ public class SchedulerService {
 
                 Date scheduleDate =
                         job.getScheduleDate();
-
 
                 Time scheduleTime =
                         job.getScheduleTime();
@@ -317,16 +302,38 @@ public class SchedulerService {
         );
 
 
-        try {
+        // ==================================================
+        // JOB EXECUTION
+        // ==================================================
 
-            // ==================================================
-            // SIMULATE JOB EXECUTION
-            // ==================================================
+        try {
 
             System.out.println(
                     "Executing job..."
             );
 
+
+            // ==================================================
+            // TEST FAILURE HANDLING
+            // ==================================================
+
+            if ("FAIL_TEST".equalsIgnoreCase(
+                    job.getJobType()
+            )) {
+
+                System.out.println(
+                        "TEST FAILURE TRIGGERED!"
+                );
+
+                throw new RuntimeException(
+                        "Simulated job execution failure."
+                );
+            }
+
+
+            // ==================================================
+            // NORMAL JOB EXECUTION
+            // ==================================================
 
             Thread.sleep(2000);
 
@@ -376,7 +383,6 @@ public class SchedulerService {
 
             Thread.currentThread().interrupt();
 
-
             System.out.println(
                     "Job execution interrupted."
             );
@@ -413,7 +419,6 @@ public class SchedulerService {
                     "Job execution failed."
             );
 
-
             e.printStackTrace();
 
 
@@ -448,7 +453,6 @@ public class SchedulerService {
             Job job,
             String status,
             String result) {
-
 
         JobHistory history =
                 new JobHistory();
