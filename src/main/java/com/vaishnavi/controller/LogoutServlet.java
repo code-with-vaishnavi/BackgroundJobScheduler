@@ -13,16 +13,40 @@ import java.io.IOException;
 public class LogoutServlet extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
+    protected void doGet(
+            HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
+        // Get existing session without creating a new one
+        HttpSession session =
+                request.getSession(false);
 
+        // Invalidate the session
         if (session != null) {
             session.invalidate();
         }
 
-        response.sendRedirect("jsp/login.jsp");
+        // Prevent cached protected pages
+        response.setHeader(
+                "Cache-Control",
+                "no-cache, no-store, must-revalidate"
+        );
+
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
+
+        response.setDateHeader(
+                "Expires",
+                0
+        );
+
+        // Redirect to login page
+        response.sendRedirect(
+                request.getContextPath()
+                        + "/jsp/login.jsp"
+        );
     }
 }
