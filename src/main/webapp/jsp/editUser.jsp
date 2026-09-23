@@ -3,6 +3,13 @@
 
 <%
     User user = (User) request.getAttribute("user");
+
+    if (user == null) {
+        response.sendRedirect(
+                request.getContextPath() + "/UserServlet"
+        );
+        return;
+    }
 %>
 
 <!DOCTYPE html>
@@ -14,7 +21,8 @@
 
     <title>Edit User</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
 </head>
 
@@ -32,7 +40,8 @@
 
         <div class="card-body">
 
-            <form action="<%= request.getContextPath() %>/UserServlet" method="post">
+            <form action="<%= request.getContextPath() %>/UserServlet"
+                  method="post">
 
                 <input type="hidden"
                        name="action"
@@ -42,9 +51,14 @@
                        name="userId"
                        value="<%= user.getUserId() %>">
 
+
+                <!-- Full Name -->
+
                 <div class="mb-3">
 
-                    <label>Full Name</label>
+                    <label class="form-label">
+                        Full Name
+                    </label>
 
                     <input type="text"
                            name="fullName"
@@ -54,9 +68,14 @@
 
                 </div>
 
+
+                <!-- Email -->
+
                 <div class="mb-3">
 
-                    <label>Email</label>
+                    <label class="form-label">
+                        Email
+                    </label>
 
                     <input type="email"
                            name="email"
@@ -66,40 +85,65 @@
 
                 </div>
 
+
+                <!-- New Password -->
+
                 <div class="mb-3">
 
-                    <label>Password</label>
+                    <label class="form-label">
+                        New Password
+                    </label>
 
-                    <input type="text"
+                    <input type="password"
                            name="password"
                            class="form-control"
-                           value="<%= user.getPassword() %>"
-                           required>
+                           placeholder="Leave blank to keep current password">
+
+                    <small class="text-muted">
+                        Leave this field blank if you do not want to change the password.
+                    </small>
 
                 </div>
 
+
+                <!-- Role -->
+
                 <div class="mb-3">
 
-                    <label>Role</label>
+                    <label class="form-label">
+                        Role
+                    </label>
 
                     <select name="role"
                             class="form-select">
 
                         <option value="ADMIN"
-                            <%= user.getRole().equals("ADMIN") ? "selected" : "" %>>
+                            <%= "ADMIN".equalsIgnoreCase(user.getRole())
+                                    ? "selected"
+                                    : "" %>>
+
                             ADMIN
+
                         </option>
 
                         <option value="USER"
-                            <%= user.getRole().equals("USER") ? "selected" : "" %>>
+                            <%= "USER".equalsIgnoreCase(user.getRole())
+                                    ? "selected"
+                                    : "" %>>
+
                             USER
+
                         </option>
 
                     </select>
 
                 </div>
 
-                <button class="btn btn-warning">
+
+                <!-- Buttons -->
+
+                <button type="submit"
+                        class="btn btn-warning">
 
                     Update User
 
@@ -123,4 +167,5 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
+
 </html>
