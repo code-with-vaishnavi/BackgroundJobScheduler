@@ -23,7 +23,6 @@ public class JobServlet extends HttpServlet {
     private JobDAO jobDAO;
     private JobHistoryDAO historyDAO;
 
-
     // ==================================================
     // INIT
     // ==================================================
@@ -33,6 +32,7 @@ public class JobServlet extends HttpServlet {
 
         jobDAO = new JobDAO();
         historyDAO = new JobHistoryDAO();
+
     }
 
 
@@ -41,11 +41,32 @@ public class JobServlet extends HttpServlet {
     // ==================================================
 
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
+    protected void doGet(
+            HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
+        HttpSession session =
+                request.getSession(false);
+
+        // ==================================================
+        // PREVENT BROWSER CACHE
+        // ==================================================
+
+        response.setHeader(
+                "Cache-Control",
+                "no-cache, no-store, must-revalidate"
+        );
+
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
+
+        response.setDateHeader(
+                "Expires",
+                0
+        );
 
 
         // ==================================================
@@ -82,11 +103,11 @@ public class JobServlet extends HttpServlet {
 
             List<Job> jobList;
 
-
             // ADMIN → ALL JOBS
             if ("ADMIN".equalsIgnoreCase(role)) {
 
-                jobList = jobDAO.getAllJobs();
+                jobList =
+                        jobDAO.getAllJobs();
 
             }
 
@@ -108,7 +129,10 @@ public class JobServlet extends HttpServlet {
 
             request.getRequestDispatcher(
                     "/jsp/jobs.jsp"
-            ).forward(request, response);
+            ).forward(
+                    request,
+                    response
+            );
         }
 
 
@@ -160,7 +184,10 @@ public class JobServlet extends HttpServlet {
 
             request.getRequestDispatcher(
                     "/jsp/editJob.jsp"
-            ).forward(request, response);
+            ).forward(
+                    request,
+                    response
+            );
         }
 
 
@@ -316,13 +343,16 @@ public class JobServlet extends HttpServlet {
                 JobHistory history =
                         new JobHistory();
 
+
                 history.setJobId(
                         job.getJobId()
                 );
 
+
                 history.setJobName(
                         job.getJobName()
                 );
+
 
                 history.setExecutionTime(
                         new Timestamp(
@@ -330,9 +360,11 @@ public class JobServlet extends HttpServlet {
                         )
                 );
 
+
                 history.setStatus(
                         "Failed"
                 );
+
 
                 history.setResult(
                         "Job execution interrupted."
@@ -418,12 +450,32 @@ public class JobServlet extends HttpServlet {
     // ==================================================
 
     @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response)
+    protected void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session =
                 request.getSession(false);
+
+        // ==================================================
+        // PREVENT BROWSER CACHE
+        // ==================================================
+
+        response.setHeader(
+                "Cache-Control",
+                "no-cache, no-store, must-revalidate"
+        );
+
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
+
+        response.setDateHeader(
+                "Expires",
+                0
+        );
 
 
         // ==================================================
@@ -460,7 +512,8 @@ public class JobServlet extends HttpServlet {
 
         if (action == null) {
 
-            Job job = new Job();
+            Job job =
+                    new Job();
 
 
             job.setJobName(
@@ -602,10 +655,13 @@ public class JobServlet extends HttpServlet {
             }
 
 
-            Job job = new Job();
+            Job job =
+                    new Job();
 
 
-            job.setJobId(jobId);
+            job.setJobId(
+                    jobId
+            );
 
 
             job.setJobName(

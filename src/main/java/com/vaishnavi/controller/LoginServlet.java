@@ -21,47 +21,93 @@ public class LoginServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
+        /*
+         * Prevent browser caching
+         */
+        response.setHeader(
+                "Cache-Control",
+                "no-cache, no-store, must-revalidate"
+        );
+
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
+
+        response.setDateHeader(
+                "Expires",
+                0
+        );
+
+        /*
+         * Get login credentials
+         */
         String email =
                 request.getParameter("email");
 
         String password =
                 request.getParameter("password");
 
+        /*
+         * Basic validation
+         */
+        if (email == null
+                || email.trim().isEmpty()
+                || password == null
+                || password.isEmpty()) {
 
+            response.getWriter().println(
+                    "<h2>Email and Password are required.</h2>"
+            );
+
+            return;
+        }
+
+        /*
+         * Authenticate user
+         */
         UserDAO dao =
                 new UserDAO();
 
         User user =
                 dao.loginUser(
-                        email,
+                        email.trim(),
                         password
                 );
 
-
+        /*
+         * Login successful
+         */
         if (user != null) {
 
-            // ==========================================
-            // CREATE SESSION
-            // ==========================================
+            /*
+             * Invalidate any existing session
+             * before creating a new authenticated session.
+             */
+            HttpSession oldSession =
+                    request.getSession(false);
 
+            if (oldSession != null) {
+                oldSession.invalidate();
+            }
+
+            /*
+             * Create fresh authenticated session
+             */
             HttpSession session =
-                    request.getSession();
+                    request.getSession(true);
 
-
-            // ==========================================
-            // STORE LOGGED-IN USER
-            // ==========================================
-
+            /*
+             * Store logged-in user
+             */
             session.setAttribute(
                     "user",
                     user
             );
 
-
-            // ==========================================
-            // ROLE-BASED REDIRECT
-            // ==========================================
-
+            /*
+             * Role-based redirect
+             */
             if ("ADMIN".equalsIgnoreCase(
                     user.getRole()
             )) {
@@ -79,9 +125,11 @@ public class LoginServlet extends HttpServlet {
                 );
             }
 
-
         } else {
 
+            /*
+             * Invalid credentials
+             */
             response.getWriter().println(
                     "<h2>Invalid Email or Password</h2>"
             );

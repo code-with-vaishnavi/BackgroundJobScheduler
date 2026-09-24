@@ -29,7 +29,8 @@ public class UserServlet extends HttpServlet {
 
     private boolean isAdmin(HttpServletRequest request) {
 
-        HttpSession session = request.getSession(false);
+        HttpSession session =
+                request.getSession(false);
 
         if (session == null) {
             return false;
@@ -48,6 +49,39 @@ public class UserServlet extends HttpServlet {
     }
 
     // ==================================================
+    // NO-CACHE HEADERS
+    // ==================================================
+
+    private void setNoCacheHeaders(
+            HttpServletResponse response) {
+
+        response.setHeader(
+                "Cache-Control",
+                "no-cache, no-store, must-revalidate"
+        );
+
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
+
+        response.setDateHeader(
+                "Expires",
+                0
+        );
+    }
+
+    // ==================================================
+    // ROLE VALIDATION
+    // ==================================================
+
+    private boolean isValidRole(String role) {
+
+        return "ADMIN".equalsIgnoreCase(role)
+                || "USER".equalsIgnoreCase(role);
+    }
+
+    // ==================================================
     // GET REQUEST
     // ==================================================
 
@@ -56,6 +90,8 @@ public class UserServlet extends HttpServlet {
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
+
+        setNoCacheHeaders(response);
 
         // ==================================================
         // ADMIN ONLY
@@ -125,6 +161,16 @@ public class UserServlet extends HttpServlet {
                     User user =
                             userDAO.getUserById(userId);
 
+                    if (user == null) {
+
+                        response.sendRedirect(
+                                request.getContextPath()
+                                        + "/UserServlet"
+                        );
+
+                        return;
+                    }
+
                     request.setAttribute(
                             "user",
                             user
@@ -187,6 +233,8 @@ public class UserServlet extends HttpServlet {
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
+
+        setNoCacheHeaders(response);
 
         // ==================================================
         // ADMIN ONLY
@@ -251,6 +299,19 @@ public class UserServlet extends HttpServlet {
                                 "role"
                         );
 
+                // ==================================================
+                // VALIDATE ROLE
+                // ==================================================
+
+                if (!isValidRole(role)) {
+
+                    response.getWriter().println(
+                            "<h2>Invalid User Role!</h2>"
+                    );
+
+                    return;
+                }
+
                 User user =
                         new User();
 
@@ -313,6 +374,19 @@ public class UserServlet extends HttpServlet {
                 request.getParameter(
                         "role"
                 );
+
+        // ==================================================
+        // VALIDATE ROLE
+        // ==================================================
+
+        if (!isValidRole(role)) {
+
+            response.getWriter().println(
+                    "<h2>Invalid User Role!</h2>"
+            );
+
+            return;
+        }
 
         User user =
                 new User();

@@ -2,21 +2,59 @@
 <%@ page import="com.vaishnavi.model.User" %>
 
 <%
-    User user = (User) session.getAttribute("user");
+    // ==================================================
+    // CHECK LOGIN SESSION
+    // ==================================================
+
+    User user =
+            (User) session.getAttribute("user");
 
     if (user == null) {
-        response.sendRedirect(request.getContextPath() + "/jsp/login.jsp");
+
+        response.sendRedirect(
+                request.getContextPath()
+                        + "/jsp/login.jsp"
+        );
+
         return;
     }
 
-    if (!"USER".equalsIgnoreCase(user.getRole())) {
-        response.sendRedirect(request.getContextPath() + "/AdminDashboardServlet");
+
+    // ==================================================
+    // USER ONLY
+    // ==================================================
+
+    if (!"USER".equalsIgnoreCase(
+            user.getRole()
+    )) {
+
+        response.sendRedirect(
+                request.getContextPath()
+                        + "/AdminDashboardServlet"
+        );
+
         return;
     }
 
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    response.setHeader("Pragma", "no-cache");
-    response.setDateHeader("Expires", 0);
+
+    // ==================================================
+    // PREVENT BROWSER CACHE
+    // ==================================================
+
+    response.setHeader(
+            "Cache-Control",
+            "no-cache, no-store, must-revalidate"
+    );
+
+    response.setHeader(
+            "Pragma",
+            "no-cache"
+    );
+
+    response.setDateHeader(
+            "Expires",
+            0
+    );
 %>
 
 <!DOCTYPE html>
@@ -26,19 +64,24 @@
 
     <meta charset="UTF-8">
 
-    <title>User Dashboard</title>
+    <title>User Dashboard - Background Job Scheduler</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-          rel="stylesheet">
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+            rel="stylesheet">
 
 </head>
 
 <body class="bg-light">
 
-<!-- Navbar -->
+
+<!-- ==================================================
+     NAVBAR
+     ================================================== -->
 
 <nav class="navbar navbar-dark bg-primary shadow">
 
@@ -52,16 +95,22 @@
 
         </span>
 
+
         <div class="text-white">
 
             Welcome,
 
-            <b><%= user.getFullName() %></b>
+            <b>
+                <%= user.getFullName() %>
+            </b>
 
             |
 
-            <a href="<%=request.getContextPath()%>/LogoutServlet"
-               class="btn btn-danger btn-sm">
+            <a
+                    href="<%= request.getContextPath() %>/LogoutServlet"
+                    class="btn btn-danger btn-sm">
+
+                <i class="bi bi-box-arrow-right"></i>
 
                 Logout
 
@@ -74,9 +123,16 @@
 </nav>
 
 
+<!-- ==================================================
+     MAIN CONTAINER
+     ================================================== -->
+
 <div class="container mt-4">
 
-    <!-- User Welcome -->
+
+    <!-- ==================================================
+         USER WELCOME
+         ================================================== -->
 
     <div class="alert alert-info">
 
@@ -97,18 +153,24 @@
     </div>
 
 
-    <!-- User Features -->
+    <!-- ==================================================
+         USER FEATURES
+         ================================================== -->
 
     <div class="row g-4">
 
 
-        <div class="col-md-4">
+        <!-- CREATE JOB -->
+
+        <div class="col-md-6">
 
             <div class="card shadow h-100">
 
                 <div class="card-body text-center">
 
-                    <i class="bi bi-plus-circle-fill fs-1 text-primary"></i>
+                    <i
+                            class="bi bi-plus-circle-fill fs-1 text-primary">
+                    </i>
 
                     <h4 class="mt-3">
 
@@ -122,8 +184,11 @@
 
                     </p>
 
-                    <a href="<%=request.getContextPath()%>/jsp/addJob.jsp"
-                       class="btn btn-primary">
+                    <a
+                            href="<%= request.getContextPath() %>/jsp/addJob.jsp"
+                            class="btn btn-primary">
+
+                        <i class="bi bi-plus-circle"></i>
 
                         Create Job
 
@@ -136,13 +201,17 @@
         </div>
 
 
-        <div class="col-md-4">
+        <!-- MY JOBS -->
+
+        <div class="col-md-6">
 
             <div class="card shadow h-100">
 
                 <div class="card-body text-center">
 
-                    <i class="bi bi-briefcase-fill fs-1 text-success"></i>
+                    <i
+                            class="bi bi-briefcase-fill fs-1 text-success">
+                    </i>
 
                     <h4 class="mt-3">
 
@@ -152,48 +221,17 @@
 
                     <p>
 
-                        View your scheduled jobs.
+                        View and manage your scheduled jobs.
 
                     </p>
 
-                    <a href="<%=request.getContextPath()%>/JobServlet"
-                       class="btn btn-success">
+                    <a
+                            href="<%= request.getContextPath() %>/JobServlet"
+                            class="btn btn-success">
+
+                        <i class="bi bi-briefcase"></i>
 
                         My Jobs
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-4">
-
-            <div class="card shadow h-100">
-
-                <div class="card-body text-center">
-
-                    <i class="bi bi-clock-history fs-1 text-info"></i>
-
-                    <h4 class="mt-3">
-
-                        Job History
-
-                    </h4>
-
-                    <p>
-
-                        View your job execution history.
-
-                    </p>
-
-                    <a href="<%=request.getContextPath()%>/JobHistoryServlet"
-                       class="btn btn-info text-white">
-
-                        View History
 
                     </a>
 
@@ -206,15 +244,24 @@
     </div>
 
 
-    <!-- User Information -->
+    <!-- ==================================================
+         USER INFORMATION
+         ================================================== -->
 
     <div class="card shadow mt-4">
 
         <div class="card-body">
 
-            <h4>User Information</h4>
+            <h4>
+
+                <i class="bi bi-person-vcard"></i>
+
+                User Information
+
+            </h4>
 
             <hr>
+
 
             <p>
 
@@ -224,6 +271,7 @@
 
             </p>
 
+
             <p>
 
                 <strong>Email:</strong>
@@ -231,6 +279,7 @@
                 <%= user.getEmail() %>
 
             </p>
+
 
             <p>
 
@@ -249,6 +298,15 @@
     </div>
 
 </div>
+
+
+<!-- ==================================================
+     BOOTSTRAP JS
+     ================================================== -->
+
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
 
 </body>
 

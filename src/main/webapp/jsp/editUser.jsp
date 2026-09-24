@@ -2,12 +2,75 @@
 <%@ page import="com.vaishnavi.model.User" %>
 
 <%
-    User user = (User) request.getAttribute("user");
+    // ==================================================
+    // CHECK LOGIN SESSION
+    // ==================================================
+
+    User loggedUser =
+            (User) session.getAttribute("user");
+
+    if (loggedUser == null) {
+
+        response.sendRedirect(
+                request.getContextPath()
+                        + "/jsp/login.jsp"
+        );
+
+        return;
+    }
+
+
+    // ==================================================
+    // ADMIN ONLY
+    // ==================================================
+
+    if (!"ADMIN".equalsIgnoreCase(
+            loggedUser.getRole()
+    )) {
+
+        response.sendRedirect(
+                request.getContextPath()
+                        + "/UserDashboardServlet"
+        );
+
+        return;
+    }
+
+
+    // ==================================================
+    // PREVENT BROWSER CACHE
+    // ==================================================
+
+    response.setHeader(
+            "Cache-Control",
+            "no-cache, no-store, must-revalidate"
+    );
+
+    response.setHeader(
+            "Pragma",
+            "no-cache"
+    );
+
+    response.setDateHeader(
+            "Expires",
+            0
+    );
+
+
+    // ==================================================
+    // GET USER
+    // ==================================================
+
+    User user =
+            (User) request.getAttribute("user");
 
     if (user == null) {
+
         response.sendRedirect(
-                request.getContextPath() + "/UserServlet"
+                request.getContextPath()
+                        + "/UserServlet"
         );
+
         return;
     }
 %>
@@ -19,106 +82,169 @@
 
     <meta charset="UTF-8">
 
-    <title>Edit User</title>
+    <title>Edit User - Background Job Scheduler</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+            rel="stylesheet">
 
 </head>
 
 <body class="bg-light">
 
+
 <div class="container mt-5">
 
     <div class="card shadow">
 
-        <div class="card-header bg-warning">
 
-            <h3>Edit User</h3>
+        <!-- ==================================================
+             HEADER
+             ================================================== -->
+
+        <div class="card-header bg-warning text-dark">
+
+            <h3 class="mb-0">
+
+                <i class="bi bi-person-gear"></i>
+
+                Edit User
+
+            </h3>
 
         </div>
 
+
         <div class="card-body">
 
-            <form action="<%= request.getContextPath() %>/UserServlet"
-                  method="post">
 
-                <input type="hidden"
-                       name="action"
-                       value="update">
+            <!-- ==================================================
+                 FORM
+                 ================================================== -->
 
-                <input type="hidden"
-                       name="userId"
-                       value="<%= user.getUserId() %>">
+            <form
+                    action="<%= request.getContextPath() %>/UserServlet"
+                    method="post">
+
+                <!-- ACTION -->
+
+                <input
+                        type="hidden"
+                        name="action"
+                        value="update">
 
 
-                <!-- Full Name -->
+                <!-- USER ID -->
+
+                <input
+                        type="hidden"
+                        name="userId"
+                        value="<%= user.getUserId() %>">
+
+
+                <!-- ==================================================
+                     FULL NAME
+                     ================================================== -->
 
                 <div class="mb-3">
 
                     <label class="form-label">
+
                         Full Name
+
                     </label>
 
-                    <input type="text"
-                           name="fullName"
-                           class="form-control"
-                           value="<%= user.getFullName() %>"
-                           required>
+                    <input
+                            type="text"
+                            name="fullName"
+                            class="form-control"
+                            value="<%= user.getFullName() %>"
+                            maxlength="100"
+                            required>
 
                 </div>
 
 
-                <!-- Email -->
+                <!-- ==================================================
+                     EMAIL
+                     ================================================== -->
 
                 <div class="mb-3">
 
                     <label class="form-label">
+
                         Email
+
                     </label>
 
-                    <input type="email"
-                           name="email"
-                           class="form-control"
-                           value="<%= user.getEmail() %>"
-                           required>
+                    <input
+                            type="email"
+                            name="email"
+                            class="form-control"
+                            value="<%= user.getEmail() %>"
+                            autocomplete="email"
+                            maxlength="150"
+                            required>
 
                 </div>
 
 
-                <!-- New Password -->
+                <!-- ==================================================
+                     NEW PASSWORD
+                     ================================================== -->
 
                 <div class="mb-3">
 
                     <label class="form-label">
+
                         New Password
+
                     </label>
 
-                    <input type="password"
-                           name="password"
-                           class="form-control"
-                           placeholder="Leave blank to keep current password">
+                    <input
+                            type="password"
+                            name="password"
+                            class="form-control"
+                            placeholder="Leave blank to keep current password"
+                            autocomplete="new-password"
+                            minlength="6"
+                            maxlength="100">
 
-                    <small class="text-muted">
-                        Leave this field blank if you do not want to change the password.
-                    </small>
+                    <div class="form-text">
+
+                        Leave this field blank if you do not want
+                        to change the current password.
+
+                    </div>
 
                 </div>
 
 
-                <!-- Role -->
+                <!-- ==================================================
+                     ROLE
+                     ================================================== -->
 
                 <div class="mb-3">
 
                     <label class="form-label">
+
                         Role
+
                     </label>
 
-                    <select name="role"
-                            class="form-select">
+                    <select
+                            name="role"
+                            class="form-select"
+                            required>
 
-                        <option value="ADMIN"
-                            <%= "ADMIN".equalsIgnoreCase(user.getRole())
+                        <option
+                                value="ADMIN"
+                            <%= "ADMIN".equalsIgnoreCase(
+                                    user.getRole())
                                     ? "selected"
                                     : "" %>>
 
@@ -126,8 +252,10 @@
 
                         </option>
 
-                        <option value="USER"
-                            <%= "USER".equalsIgnoreCase(user.getRole())
+                        <option
+                                value="USER"
+                            <%= "USER".equalsIgnoreCase(
+                                    user.getRole())
                                     ? "selected"
                                     : "" %>>
 
@@ -140,17 +268,26 @@
                 </div>
 
 
-                <!-- Buttons -->
+                <!-- ==================================================
+                     BUTTONS
+                     ================================================== -->
 
-                <button type="submit"
+                <button
+                        type="submit"
                         class="btn btn-warning">
+
+                    <i class="bi bi-check-circle"></i>
 
                     Update User
 
                 </button>
 
-                <a href="<%= request.getContextPath() %>/UserServlet"
-                   class="btn btn-secondary">
+
+                <a
+                        href="<%= request.getContextPath() %>/UserServlet"
+                        class="btn btn-secondary">
+
+                    <i class="bi bi-arrow-left"></i>
 
                     Cancel
 
@@ -164,7 +301,10 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
 
 </body>
 

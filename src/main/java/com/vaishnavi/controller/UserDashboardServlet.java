@@ -3,11 +3,14 @@ package com.vaishnavi.controller;
 import com.vaishnavi.dao.JobDAO;
 import com.vaishnavi.dao.UserDAO;
 
+import com.vaishnavi.model.User;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -26,28 +29,103 @@ public class UserDashboardServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
+    protected void doGet(
+            HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.setAttribute("totalUsers",
-                userDAO.getTotalUsers());
+        /*
+         * Prevent browser caching
+         */
+        response.setHeader(
+                "Cache-Control",
+                "no-cache, no-store, must-revalidate"
+        );
 
-        request.setAttribute("totalJobs",
-                jobDAO.getTotalJobs());
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
 
-        request.setAttribute("pendingJobs",
-                jobDAO.getPendingJobs());
+        response.setDateHeader(
+                "Expires",
+                0
+        );
 
-        request.setAttribute("completedJobs",
-                jobDAO.getCompletedJobs());
+        /*
+         * Check active session
+         */
+        HttpSession session =
+                request.getSession(false);
 
-        request.setAttribute("failedJobs",
-                jobDAO.getFailedJobs());
+        if (session == null
+                || session.getAttribute("user") == null) {
 
-        request.getRequestDispatcher("/jsp/userDashboard.jsp")
-                .forward(request, response);
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/jsp/login.jsp"
+            );
 
+            return;
+        }
+
+        /*
+         * Get logged-in user
+         */
+        User loggedUser =
+                (User) session.getAttribute("user");
+
+        /*
+         * Only USER accounts should access
+         * the User Dashboard.
+         */
+        if (!"USER".equalsIgnoreCase(
+                loggedUser.getRole())) {
+
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/AdminDashboardServlet"
+            );
+
+            return;
+        }
+
+        /*
+         * Load dashboard statistics
+         */
+        request.setAttribute(
+                "totalUsers",
+                userDAO.getTotalUsers()
+        );
+
+        request.setAttribute(
+                "totalJobs",
+                jobDAO.getTotalJobs()
+        );
+
+        request.setAttribute(
+                "pendingJobs",
+                jobDAO.getPendingJobs()
+        );
+
+        request.setAttribute(
+                "completedJobs",
+                jobDAO.getCompletedJobs()
+        );
+
+        request.setAttribute(
+                "failedJobs",
+                jobDAO.getFailedJobs()
+        );
+
+        /*
+         * Open User Dashboard
+         */
+        request.getRequestDispatcher(
+                "/jsp/userDashboard.jsp"
+        ).forward(
+                request,
+                response
+        );
     }
-
 }

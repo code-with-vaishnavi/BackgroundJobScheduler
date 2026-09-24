@@ -26,22 +26,38 @@ public class AdminDashboardServlet extends HttpServlet {
         jobDAO = new JobDAO();
     }
 
-
     @Override
     protected void doGet(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
+        /*
+         * Prevent browser caching
+         */
+        response.setHeader(
+                "Cache-Control",
+                "no-cache, no-store, must-revalidate"
+        );
 
-        // ==================================================
-        // CHECK LOGIN SESSION
-        // ==================================================
+        response.setHeader(
+                "Pragma",
+                "no-cache"
+        );
 
+        response.setDateHeader(
+                "Expires",
+                0
+        );
+
+        /*
+         * Check active session
+         */
         HttpSession session =
                 request.getSession(false);
 
-        if (session == null) {
+        if (session == null
+                || session.getAttribute("user") == null) {
 
             response.sendRedirect(
                     request.getContextPath()
@@ -51,33 +67,17 @@ public class AdminDashboardServlet extends HttpServlet {
             return;
         }
 
-
-        // ==================================================
-        // GET LOGGED-IN USER
-        // ==================================================
-
+        /*
+         * Get logged-in user
+         */
         User loggedInUser =
                 (User) session.getAttribute("user");
 
-
-        if (loggedInUser == null) {
-
-            response.sendRedirect(
-                    request.getContextPath()
-                            + "/jsp/login.jsp"
-            );
-
-            return;
-        }
-
-
-        // ==================================================
-        // ADMIN ONLY
-        // ==================================================
-
+        /*
+         * ADMIN only
+         */
         if (!"ADMIN".equalsIgnoreCase(
-                loggedInUser.getRole()
-        )) {
+                loggedInUser.getRole())) {
 
             response.sendRedirect(
                     request.getContextPath()
@@ -87,11 +87,9 @@ public class AdminDashboardServlet extends HttpServlet {
             return;
         }
 
-
-        // ==================================================
-        // DASHBOARD DATA
-        // ==================================================
-
+        /*
+         * Dashboard statistics
+         */
         request.setAttribute(
                 "totalUsers",
                 userDAO.getTotalUsers()
@@ -117,7 +115,9 @@ public class AdminDashboardServlet extends HttpServlet {
                 jobDAO.getFailedJobs()
         );
 
-
+        /*
+         * Open Admin Dashboard
+         */
         request.getRequestDispatcher(
                 "/jsp/adminDashboard.jsp"
         ).forward(

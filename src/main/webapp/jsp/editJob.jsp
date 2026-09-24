@@ -3,17 +3,77 @@
 <%@ page import="com.vaishnavi.model.User" %>
 
 <%
-    User loggedUser = (User) session.getAttribute("user");
+    // ==================================================
+    // CHECK LOGIN SESSION
+    // ==================================================
+
+    User loggedUser =
+            (User) session.getAttribute("user");
 
     if (loggedUser == null) {
-        response.sendRedirect(request.getContextPath() + "/jsp/login.jsp");
+
+        response.sendRedirect(
+                request.getContextPath()
+                        + "/jsp/login.jsp"
+        );
+
         return;
     }
 
-    Job job = (Job) request.getAttribute("job");
+
+    // ==================================================
+    // ROLE CHECK
+    // ==================================================
+
+    String role =
+            loggedUser.getRole();
+
+    if (!"USER".equalsIgnoreCase(role)
+            && !"ADMIN".equalsIgnoreCase(role)) {
+
+        response.sendRedirect(
+                request.getContextPath()
+                        + "/jsp/login.jsp"
+        );
+
+        return;
+    }
+
+
+    // ==================================================
+    // PREVENT BROWSER CACHE
+    // ==================================================
+
+    response.setHeader(
+            "Cache-Control",
+            "no-cache, no-store, must-revalidate"
+    );
+
+    response.setHeader(
+            "Pragma",
+            "no-cache"
+    );
+
+    response.setDateHeader(
+            "Expires",
+            0
+    );
+
+
+    // ==================================================
+    // GET JOB
+    // ==================================================
+
+    Job job =
+            (Job) request.getAttribute("job");
 
     if (job == null) {
-        response.sendRedirect(request.getContextPath() + "/JobServlet");
+
+        response.sendRedirect(
+                request.getContextPath()
+                        + "/JobServlet"
+        );
+
         return;
     }
 %>
@@ -23,14 +83,18 @@
 
 <head>
 
-    <title>Edit Job</title>
+    <meta charset="UTF-8">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <title>Edit Job - Background Job Scheduler</title>
+
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
 
 </head>
 
 <body class="bg-light">
+
 
 <div class="container mt-5">
 
@@ -38,25 +102,36 @@
 
         <div class="card-header bg-warning text-dark">
 
-            <h3>Edit Job</h3>
+            <h3 class="mb-0">
+                Edit Job
+            </h3>
 
         </div>
 
+
         <div class="card-body">
 
-            <form action="<%=request.getContextPath()%>/JobServlet"
-                  method="post">
+            <form
+                    action="<%= request.getContextPath() %>/JobServlet"
+                    method="post">
 
-                <input type="hidden"
-                       name="action"
-                       value="update">
+                <!-- ACTION -->
 
-                <input type="hidden"
-                       name="jobId"
-                       value="<%=job.getJobId()%>">
+                <input
+                        type="hidden"
+                        name="action"
+                        value="update">
 
 
-                <!-- Job Name -->
+                <!-- JOB ID -->
+
+                <input
+                        type="hidden"
+                        name="jobId"
+                        value="<%= job.getJobId() %>">
+
+
+                <!-- JOB NAME -->
 
                 <div class="mb-3">
 
@@ -64,16 +139,18 @@
                         Job Name
                     </label>
 
-                    <input type="text"
-                           class="form-control"
-                           name="jobName"
-                           value="<%=job.getJobName()%>"
-                           required>
+                    <input
+                            type="text"
+                            class="form-control"
+                            name="jobName"
+                            value="<%= job.getJobName() %>"
+                            maxlength="100"
+                            required>
 
                 </div>
 
 
-                <!-- Description -->
+                <!-- DESCRIPTION -->
 
                 <div class="mb-3">
 
@@ -81,15 +158,17 @@
                         Description
                     </label>
 
-                    <textarea class="form-control"
-                              name="jobDescription"
-                              rows="3"
-                              required><%=job.getJobDescription()%></textarea>
+                    <textarea
+                            class="form-control"
+                            name="jobDescription"
+                            rows="4"
+                            maxlength="500"
+                            required><%= job.getJobDescription() %></textarea>
 
                 </div>
 
 
-                <!-- Job Type -->
+                <!-- JOB TYPE -->
 
                 <div class="mb-3">
 
@@ -97,16 +176,18 @@
                         Job Type
                     </label>
 
-                    <input type="text"
-                           class="form-control"
-                           name="jobType"
-                           value="<%=job.getJobType()%>"
-                           required>
+                    <input
+                            type="text"
+                            class="form-control"
+                            name="jobType"
+                            value="<%= job.getJobType() %>"
+                            maxlength="50"
+                            required>
 
                 </div>
 
 
-                <!-- Job Status -->
+                <!-- JOB STATUS -->
 
                 <div class="mb-3">
 
@@ -114,25 +195,36 @@
                         Job Status
                     </label>
 
-                    <select class="form-select"
-                            name="jobStatus">
+                    <select
+                            class="form-select"
+                            name="jobStatus"
+                            required>
 
-                        <option value="Active"
+                        <option
+                                value="Active"
                             <%= "Active".equals(job.getJobStatus())
                                     ? "selected" : "" %>>
+
                             Active
+
                         </option>
 
-                        <option value="Inactive"
+                        <option
+                                value="Inactive"
                             <%= "Inactive".equals(job.getJobStatus())
                                     ? "selected" : "" %>>
+
                             Inactive
+
                         </option>
 
-                        <option value="Completed"
+                        <option
+                                value="Completed"
                             <%= "Completed".equals(job.getJobStatus())
                                     ? "selected" : "" %>>
+
                             Completed
+
                         </option>
 
                     </select>
@@ -140,7 +232,7 @@
                 </div>
 
 
-                <!-- Schedule Date -->
+                <!-- SCHEDULE DATE -->
 
                 <div class="mb-3">
 
@@ -148,16 +240,17 @@
                         Schedule Date
                     </label>
 
-                    <input type="date"
-                           class="form-control"
-                           name="scheduleDate"
-                           value="<%=job.getScheduleDate()%>"
-                           required>
+                    <input
+                            type="date"
+                            class="form-control"
+                            name="scheduleDate"
+                            value="<%= job.getScheduleDate() %>"
+                            required>
 
                 </div>
 
 
-                <!-- Schedule Time -->
+                <!-- SCHEDULE TIME -->
 
                 <div class="mb-3">
 
@@ -165,16 +258,17 @@
                         Schedule Time
                     </label>
 
-                    <input type="time"
-                           class="form-control"
-                           name="scheduleTime"
-                           value="<%=job.getScheduleTime()%>"
-                           required>
+                    <input
+                            type="time"
+                            class="form-control"
+                            name="scheduleTime"
+                            value="<%= job.getScheduleTime() %>"
+                            required>
 
                 </div>
 
 
-                <!-- Execution Status -->
+                <!-- EXECUTION STATUS -->
 
                 <div class="mb-3">
 
@@ -182,31 +276,45 @@
                         Execution Status
                     </label>
 
-                    <select class="form-select"
-                            name="executionStatus">
+                    <select
+                            class="form-select"
+                            name="executionStatus"
+                            required>
 
-                        <option value="Pending"
+                        <option
+                                value="Pending"
                             <%= "Pending".equals(job.getExecutionStatus())
                                     ? "selected" : "" %>>
+
                             Pending
+
                         </option>
 
-                        <option value="Running"
+                        <option
+                                value="Running"
                             <%= "Running".equals(job.getExecutionStatus())
                                     ? "selected" : "" %>>
+
                             Running
+
                         </option>
 
-                        <option value="Completed"
+                        <option
+                                value="Completed"
                             <%= "Completed".equals(job.getExecutionStatus())
                                     ? "selected" : "" %>>
+
                             Completed
+
                         </option>
 
-                        <option value="Failed"
+                        <option
+                                value="Failed"
                             <%= "Failed".equals(job.getExecutionStatus())
                                     ? "selected" : "" %>>
+
                             Failed
+
                         </option>
 
                     </select>
@@ -214,18 +322,24 @@
                 </div>
 
 
-                <!-- Buttons -->
+                <!-- BUTTONS -->
 
-                <button type="submit"
+                <button
+                        type="submit"
                         class="btn btn-success">
+
+                    <i class="bi bi-check-circle"></i>
 
                     Update Job
 
                 </button>
 
 
-                <a href="<%=request.getContextPath()%>/JobServlet"
-                   class="btn btn-secondary">
+                <a
+                        href="<%= request.getContextPath() %>/JobServlet"
+                        class="btn btn-secondary">
+
+                    <i class="bi bi-arrow-left"></i>
 
                     Cancel
 
@@ -238,6 +352,11 @@
     </div>
 
 </div>
+
+
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
 
 </body>
 

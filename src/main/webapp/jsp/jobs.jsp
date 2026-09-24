@@ -4,18 +4,75 @@
 <%@ page import="com.vaishnavi.model.User" %>
 
 <%
-    List<Job> jobList = (List<Job>) request.getAttribute("jobList");
+    // ==================================================
+    // CHECK LOGIN SESSION
+    // ==================================================
 
-    User loggedUser = (User) session.getAttribute("user");
+    User loggedUser =
+            (User) session.getAttribute("user");
 
-    String userRole = "";
+    if (loggedUser == null) {
 
-    if (loggedUser != null) {
-        userRole = loggedUser.getRole();
+        response.sendRedirect(
+                request.getContextPath()
+                        + "/jsp/login.jsp"
+        );
+
+        return;
     }
 
-    boolean isAdmin = "ADMIN".equalsIgnoreCase(userRole);
-    boolean isUser = "USER".equalsIgnoreCase(userRole);
+
+    // ==================================================
+    // ROLE CHECK
+    // ==================================================
+
+    String userRole =
+            loggedUser.getRole();
+
+    boolean isAdmin =
+            "ADMIN".equalsIgnoreCase(userRole);
+
+    boolean isUser =
+            "USER".equalsIgnoreCase(userRole);
+
+
+    if (!isAdmin && !isUser) {
+
+        response.sendRedirect(
+                request.getContextPath()
+                        + "/jsp/login.jsp"
+        );
+
+        return;
+    }
+
+
+    // ==================================================
+    // PREVENT BROWSER CACHE
+    // ==================================================
+
+    response.setHeader(
+            "Cache-Control",
+            "no-cache, no-store, must-revalidate"
+    );
+
+    response.setHeader(
+            "Pragma",
+            "no-cache"
+    );
+
+    response.setDateHeader(
+            "Expires",
+            0
+    );
+
+
+    // ==================================================
+    // GET JOB LIST
+    // ==================================================
+
+    List<Job> jobList =
+            (List<Job>) request.getAttribute("jobList");
 %>
 
 <!DOCTYPE html>
@@ -23,18 +80,25 @@
 
 <head>
 
-    <title>Job Management</title>
+    <meta charset="UTF-8">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <title>Job Management - Background Job Scheduler</title>
+
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
 
 </head>
 
 <body class="bg-light">
 
+
 <div class="container mt-5">
 
-    <!-- ================= HEADER ================= -->
+
+    <!-- ==================================================
+         HEADER
+         ================================================== -->
 
     <h2 class="text-center mb-4">
 
@@ -51,36 +115,52 @@
     </h2>
 
 
-    <!-- ================= NAVIGATION ================= -->
+    <!-- ==================================================
+         NAVIGATION
+         ================================================== -->
 
     <div class="mb-3">
 
+
         <!-- ADD JOB -->
 
-        <a href="<%=request.getContextPath()%>/jsp/addJob.jsp"
-           class="btn btn-primary">
+        <a
+                href="<%= request.getContextPath() %>/jsp/addJob.jsp"
+                class="btn btn-primary">
 
-            + Add Job
+            <i class="bi bi-plus-circle"></i>
 
-        </a>
-
-
-        <!-- JOB HISTORY -->
-
-        <a href="<%=request.getContextPath()%>/JobHistoryServlet"
-           class="btn btn-info text-white">
-
-            Job History
+            Add Job
 
         </a>
+
+
+        <!-- JOB HISTORY - ADMIN ONLY -->
+
+        <% if (isAdmin) { %>
+
+            <a
+                    href="<%= request.getContextPath() %>/JobHistoryServlet"
+                    class="btn btn-info text-white">
+
+                <i class="bi bi-clock-history"></i>
+
+                Job History
+
+            </a>
+
+        <% } %>
 
 
         <!-- DASHBOARD -->
 
         <% if (isAdmin) { %>
 
-            <a href="<%=request.getContextPath()%>/AdminDashboardServlet"
-               class="btn btn-dark">
+            <a
+                    href="<%= request.getContextPath() %>/AdminDashboardServlet"
+                    class="btn btn-dark">
+
+                <i class="bi bi-speedometer2"></i>
 
                 Admin Dashboard
 
@@ -88,8 +168,11 @@
 
         <% } else { %>
 
-            <a href="<%=request.getContextPath()%>/UserDashboardServlet"
-               class="btn btn-secondary">
+            <a
+                    href="<%= request.getContextPath() %>/UserDashboardServlet"
+                    class="btn btn-secondary">
+
+                <i class="bi bi-house"></i>
 
                 My Dashboard
 
@@ -97,276 +180,313 @@
 
         <% } %>
 
+
+        <!-- LOGOUT -->
+
+        <a
+                href="<%= request.getContextPath() %>/LogoutServlet"
+                class="btn btn-danger">
+
+            <i class="bi bi-box-arrow-right"></i>
+
+            Logout
+
+        </a>
+
     </div>
 
 
-    <!-- ================= JOB TABLE ================= -->
+    <!-- ==================================================
+         JOB TABLE
+         ================================================== -->
 
-    <table class="table table-bordered table-hover table-striped">
+    <div class="table-responsive">
 
-        <thead class="table-dark">
+        <table class="table table-bordered table-hover table-striped">
 
-        <tr>
+            <thead class="table-dark">
 
-            <th>ID</th>
+            <tr>
 
-            <th>Job Name</th>
+                <th>ID</th>
 
-            <th>Description</th>
+                <th>Job Name</th>
 
-            <th>Type</th>
+                <th>Description</th>
 
-            <th>Status</th>
+                <th>Type</th>
 
-            <th>Schedule Date</th>
+                <th>Status</th>
 
-            <th>Schedule Time</th>
+                <th>Schedule Date</th>
 
-            <th>Execution</th>
+                <th>Schedule Time</th>
 
-            <th>Action</th>
+                <th>Execution</th>
 
-        </tr>
+                <th>Action</th>
 
-        </thead>
+            </tr>
 
+            </thead>
 
-        <tbody>
 
-        <%
+            <tbody>
 
-            if (jobList != null && !jobList.isEmpty()) {
+            <%
 
-                for (Job job : jobList) {
+                if (jobList != null
+                        && !jobList.isEmpty()) {
 
-        %>
+                    for (Job job : jobList) {
 
-        <tr>
+            %>
 
-            <!-- JOB ID -->
+            <tr>
 
-            <td>
-                <%= job.getJobId() %>
-            </td>
 
+                <!-- JOB ID -->
 
-            <!-- JOB NAME -->
+                <td>
+                    <%= job.getJobId() %>
+                </td>
 
-            <td>
-                <%= job.getJobName() %>
-            </td>
 
+                <!-- JOB NAME -->
 
-            <!-- DESCRIPTION -->
+                <td>
+                    <%= job.getJobName() %>
+                </td>
 
-            <td>
-                <%= job.getJobDescription() %>
-            </td>
 
+                <!-- DESCRIPTION -->
 
-            <!-- TYPE -->
+                <td>
+                    <%= job.getJobDescription() %>
+                </td>
 
-            <td>
-                <%= job.getJobType() %>
-            </td>
 
+                <!-- TYPE -->
 
-            <!-- JOB STATUS -->
+                <td>
+                    <%= job.getJobType() %>
+                </td>
 
-            <td>
-                <%= job.getJobStatus() %>
-            </td>
 
+                <!-- JOB STATUS -->
 
-            <!-- SCHEDULE DATE -->
+                <td>
+                    <%= job.getJobStatus() %>
+                </td>
 
-            <td>
-                <%= job.getScheduleDate() %>
-            </td>
 
+                <!-- SCHEDULE DATE -->
 
-            <!-- SCHEDULE TIME -->
+                <td>
+                    <%= job.getScheduleDate() %>
+                </td>
 
-            <td>
-                <%= job.getScheduleTime() %>
-            </td>
 
+                <!-- SCHEDULE TIME -->
 
-            <!-- EXECUTION STATUS -->
+                <td>
+                    <%= job.getScheduleTime() %>
+                </td>
 
-            <td>
 
-                <% if ("Completed".equalsIgnoreCase(job.getExecutionStatus())) { %>
+                <!-- EXECUTION STATUS -->
 
-                    <span class="badge bg-success">
-                        Completed
-                    </span>
+                <td>
 
-                <% } else if ("Pending".equalsIgnoreCase(job.getExecutionStatus())) { %>
+                    <% if ("Completed".equalsIgnoreCase(
+                            job.getExecutionStatus())) { %>
 
-                    <span class="badge bg-warning text-dark">
-                        Pending
-                    </span>
+                        <span class="badge bg-success">
+                            Completed
+                        </span>
 
-                <% } else if ("Running".equalsIgnoreCase(job.getExecutionStatus())) { %>
+                    <% } else if ("Pending".equalsIgnoreCase(
+                            job.getExecutionStatus())) { %>
 
-                    <span class="badge bg-primary">
-                        Running
-                    </span>
+                        <span class="badge bg-warning text-dark">
+                            Pending
+                        </span>
 
-                <% } else if ("Failed".equalsIgnoreCase(job.getExecutionStatus())) { %>
+                    <% } else if ("Running".equalsIgnoreCase(
+                            job.getExecutionStatus())) { %>
 
-                    <span class="badge bg-danger">
-                        Failed
-                    </span>
+                        <span class="badge bg-primary">
+                            Running
+                        </span>
 
-                <% } else { %>
+                    <% } else if ("Failed".equalsIgnoreCase(
+                            job.getExecutionStatus())) { %>
 
-                    <span class="badge bg-secondary">
-                        <%= job.getExecutionStatus() %>
-                    </span>
+                        <span class="badge bg-danger">
+                            Failed
+                        </span>
 
-                <% } %>
+                    <% } else { %>
 
-            </td>
+                        <span class="badge bg-secondary">
+                            <%= job.getExecutionStatus() %>
+                        </span>
 
+                    <% } %>
 
-            <!-- ================= ACTION ================= -->
+                </td>
 
-            <td>
 
+                <!-- ==================================================
+                     ACTIONS
+                     ================================================== -->
 
-                <!-- ========================================= -->
-                <!-- ADMIN ACTIONS                             -->
-                <!-- ========================================= -->
+                <td>
 
-                <% if (isAdmin) { %>
 
+                    <!-- ADMIN ACTIONS -->
 
-                    <!-- RUN -->
+                    <% if (isAdmin) { %>
 
-                    <% if ("Pending".equalsIgnoreCase(job.getExecutionStatus())) { %>
 
-                        <a href="<%=request.getContextPath()%>/JobServlet?action=run&id=<%=job.getJobId()%>"
-                           class="btn btn-success btn-sm">
+                        <!-- RUN -->
 
-                            Run
+                        <% if ("Pending".equalsIgnoreCase(
+                                job.getExecutionStatus())) { %>
+
+                            <a
+                                    href="<%= request.getContextPath() %>/JobServlet?action=run&id=<%= job.getJobId() %>"
+                                    class="btn btn-success btn-sm">
+
+                                Run
+
+                            </a>
+
+                        <% } %>
+
+
+                        <!-- EDIT -->
+
+                        <a
+                                href="<%= request.getContextPath() %>/JobServlet?action=edit&id=<%= job.getJobId() %>"
+                                class="btn btn-warning btn-sm">
+
+                            Edit
 
                         </a>
+
+
+                        <!-- DELETE -->
+
+                        <a
+                                href="<%= request.getContextPath() %>/JobServlet?action=delete&id=<%= job.getJobId() %>"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('Delete this job?');">
+
+                            Delete
+
+                        </a>
+
 
                     <% } %>
 
 
-                    <!-- EDIT -->
+                    <!-- USER ACTIONS -->
 
-                    <a href="<%=request.getContextPath()%>/JobServlet?action=edit&id=<%=job.getJobId()%>"
-                       class="btn btn-warning btn-sm">
-
-                        Edit
-
-                    </a>
+                    <% if (isUser) { %>
 
 
-                    <!-- DELETE -->
+                        <!-- RUN -->
 
-                    <a href="<%=request.getContextPath()%>/JobServlet?action=delete&id=<%=job.getJobId()%>"
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('Delete this job?');">
+                        <% if ("Pending".equalsIgnoreCase(
+                                job.getExecutionStatus())) { %>
 
-                        Delete
+                            <a
+                                    href="<%= request.getContextPath() %>/JobServlet?action=run&id=<%= job.getJobId() %>"
+                                    class="btn btn-success btn-sm">
 
-                    </a>
+                                Run
 
+                            </a>
 
-                <% } %>
-
-
-                <!-- ========================================= -->
-                <!-- USER ACTIONS                              -->
-                <!-- ========================================= -->
-
-                <% if (isUser) { %>
+                        <% } %>
 
 
-                    <!-- USER CAN RUN OWN JOB -->
+                        <!-- EDIT -->
 
-                    <% if ("Pending".equalsIgnoreCase(job.getExecutionStatus())) { %>
+                        <a
+                                href="<%= request.getContextPath() %>/JobServlet?action=edit&id=<%= job.getJobId() %>"
+                                class="btn btn-warning btn-sm">
 
-                        <a href="<%=request.getContextPath()%>/JobServlet?action=run&id=<%=job.getJobId()%>"
-                           class="btn btn-success btn-sm">
-
-                            Run
+                            Edit
 
                         </a>
+
+
+                        <!-- DELETE -->
+
+                        <a
+                                href="<%= request.getContextPath() %>/JobServlet?action=delete&id=<%= job.getJobId() %>"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('Delete this job?');">
+
+                            Delete
+
+                        </a>
+
 
                     <% } %>
 
 
-                    <!-- USER CAN EDIT OWN JOB -->
+                </td>
 
-                    <a href="<%=request.getContextPath()%>/JobServlet?action=edit&id=<%=job.getJobId()%>"
-                       class="btn btn-warning btn-sm">
-
-                        Edit
-
-                    </a>
+            </tr>
 
 
-                    <!-- USER CAN DELETE OWN JOB -->
+            <%
 
-                    <a href="<%=request.getContextPath()%>/JobServlet?action=delete&id=<%=job.getJobId()%>"
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('Delete this job?');">
+                    }
 
-                        Delete
+                } else {
 
-                    </a>
+            %>
 
 
-                <% } %>
+            <tr>
+
+                <td
+                        colspan="9"
+                        class="text-center">
+
+                    No Jobs Available
+
+                </td>
+
+            </tr>
 
 
-            </td>
-
-        </tr>
-
-
-        <%
+            <%
 
                 }
 
-            } else {
+            %>
 
-        %>
+            </tbody>
 
+        </table>
 
-        <tr>
-
-            <td colspan="9" class="text-center">
-
-                No Jobs Available
-
-            </td>
-
-        </tr>
+    </div>
 
 
-        <%
+    <!-- ==================================================
+         USER INFORMATION
+         ================================================== -->
 
-            }
-
-        %>
-
-        </tbody>
-
-    </table>
-
-
-    <!-- ================= USER INFORMATION ================= -->
-
-    <% if (isUser && loggedUser != null) { %>
+    <% if (isUser) { %>
 
         <div class="alert alert-info mt-4">
+
+            <i class="bi bi-person-circle"></i>
 
             Logged in as:
 
@@ -383,11 +503,15 @@
     <% } %>
 
 
-    <!-- ================= ADMIN INFORMATION ================= -->
+    <!-- ==================================================
+         ADMIN INFORMATION
+         ================================================== -->
 
-    <% if (isAdmin && loggedUser != null) { %>
+    <% if (isAdmin) { %>
 
         <div class="alert alert-dark mt-4">
+
+            <i class="bi bi-shield-check"></i>
 
             Logged in as:
 
@@ -405,6 +529,11 @@
 
 
 </div>
+
+
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
 
 </body>
 
